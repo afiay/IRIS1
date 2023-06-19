@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Rating{% endblock %}
+
+{% block content %}
+    <h1>Add Rating</h1>
+    <form method="post" action="{% url 'add_rating' service_id=service.id %}">
+        {% csrf_token %}
+        {{ rating_form.as_p }}
+        <button type="submit">Submit Rating</button>
+    </form>
+{% endblock %}

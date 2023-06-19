@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block styles %}
+<style>
+    body {
+        background-color: yellow;
+    }
+    .flower {
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Add the filter form at the top of the page -->
+<div class="container">
+    <div class="row justify-content-center mt-4">
+        <div class="col-md-6">
+            <form method="GET" action="{% url 'home' %}" class="mb-4">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="from_date">From Date</label>
+                        <input type="date" class="form-control" id="from_date" name="from_date" value="{{ from_date }}">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="to_date">To Date</label>
+                        <input type="date" class="form-control" id="to_date" name="to_date" value="{{ to_date }}">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="participants">Participants</label>
+                        <input type="number" class="form-control" id="participants" name="participants" value="{{ participants }}">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="country">Country</label>
+                        <select class="form-control" id="country" name="country">
+                            <option value="">All Countries</option>
+                            <!-- Add options for each country from your database -->
+                            {% for country in countries %}
+                                <option value="{{ country }}" {% if country == selected_country %}selected{% endif %}>{{ country }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label for="category">Category</label>
+                        <select class="form-control" id="category" name="category">
+                            <option value="">All Categories</option>
+                            <!-- Add options for each category from your database -->
+                            {% for category in categories %}
+                                <option value="{{ category }}" {% if category == selected_category %}selected{% endif %}>{{ category }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Apply Filter</button>
+            </form>
+        </div>
+    </div>
+
+<!-- Display the filtered services -->
+<div class="row">
+    {% for service in services %}
+        <div class="col-md-4">
+            <!-- Display service card or any other layout -->
+            <div class="card mb-4">
+                <a href="{% url 'service_detail' service.id %}"> <!-- Replace 'service_detail' with your actual URL name and 'service.id' with the appropriate identifier for the service -->
+                    <div class="card-body">
+                        <h5 class="card-title">{{ service.name }}</h5>
+                        <p class="card-text">Category: {{ service.category }}</p>
+                        <p class="card-text">Participants: {{ service.guest_limit }}</p>
+                        <!-- Add more service details here -->
+                    </div>
+                </a>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-md-12">
+            <p>No services found.</p>
+        </div>
+    {% endfor %}
+</div>
+
+    </div>
+</div>
+
+{% endblock %}

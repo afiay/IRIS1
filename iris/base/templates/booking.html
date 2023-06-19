@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Booking</h1>
+  <form method="post" action="{% url 'booking' service.id %}">
+    {% csrf_token %}
+    {% if booking_form.errors %}
+      <div class="alert alert-danger" role="alert">
+        <strong>Error:</strong> Please correct the following errors.
+      </div>
+    {% endif %}
+    <div class="form-group">
+      <label for="id_from_date">From Date:</label>
+      {{ booking_form.from_date }}
+      {% if booking_form.from_date.errors %}
+        <div class="alert alert-danger" role="alert">
+          {{ booking_form.from_date.errors }}
+        </div>
+      {% endif %}
+    </div>
+    <div class="form-group">
+      <label for="id_to_date">To Date:</label>
+      {{ booking_form.to_date }}
+      {% if booking_form.to_date.errors %}
+        <div class="alert alert-danger" role="alert">
+          {{ booking_form.to_date.errors }}
+        </div>
+      {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Book</button>
+  </form>
+{% endblock %}

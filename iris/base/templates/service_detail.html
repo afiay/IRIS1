@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Service Detail{% endblock %}
+
+{% load custom_filters %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Place the cover picture as the background of the parent container -->
+            <div class="cover-picture-container" style="background-image: url('{{ service.cover_picture.url }}')">
+                <!-- Place the service picture as an image within the cover picture container -->
+                <img src="{{ service.pictures.url }}" alt="Service Image" class="card-img rounded-circle profile-picture">
+            </div>
+        </div><br>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ service.name }}</h5>
+                    <p class="card-text">Category: {{ service.category }}</p>
+                    <p class="card-text">Country: {{ service.country }}</p>
+                    <p class="card-text">Address: {{ service.address }}</p>
+                    <p class="card-text">Available From: {{ service.available_from }}</p>
+                    <p class="card-text">Available To: {{ service.available_to }}</p>
+                    <p class="card-text">Guest Limit: {{ service.guest_limit }}</p>
+                    <a href="{% url 'booking' service.id %}" class="btn btn-primary">Book</a>
+                </div>
+            </div><br>
+                    <ul class="list-group">
+                        {% for rating in service.ratings.all %}
+                            <li class="list-group-item">
+                                <div class="rating">
+                                    {% for _ in rating.rating|get_range %}
+                                        <i class="fas fa-star"></i>
+                                    {% endfor %}
+                                </div>
+                                <div class="rating-details">
+                                    <p class="comment">{{ rating.comment }}</p>
+                                    <p class="posted-by">Rated by: {{ rating.user.username }}</p>
+                                    <p class="date">Date: {{ rating.timestamp }}</p>
+                                </div>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item">No ratings yet.</li>
+                        {% endfor %}
+                    </ul>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">{{ service.name }}</h2>
+                    <p class="card-text">{{ service.service_description }}</p>
+
+                </div>
+            </div>
+
+            {% if request.user.is_authenticated %}
+                {% if rating_form %}
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <h3>Add Rating</h3>
+                            <form method="post" action="{% url 'add_rating' service.id %}">
+                                {% csrf_token %}
+                                <div class="star-rating">
+                                    <input type="hidden" name="rating" value="">
+                                    <span class="star" data-value="1"><i class="fas fa-star"></i></span>
+                                    <span class="star" data-value="2"><i class="fas fa-star"></i></span>
+                                    <span class="star" data-value="3"><i class="fas fa-star"></i></span>
+                                    <span class="star" data-value="4"><i class="fas fa-star"></i></span>
+                                    <span class="star" data-value="5"><i class="fas fa-star"></i></span>
+                                </div>
+
+                                <textarea name="comment" class="form-control" placeholder="Comment" rows="4"></textarea>
+                                <button type="submit" class="btn btn-primary">Submit Rating</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <p class="text-muted">Please <a href="{% url 'login' %}">login</a> to make a booking or add a rating.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.star-rating .star').on('click', function() {
+            var ratingValue = $(this).data('value');
+            var $ratingInput = $(this).closest('.star-rating').find('input[name="rating"]');
+            $ratingInput.val(ratingValue);
+            updateStarRating($(this).closest('.star-rating'), ratingValue);
+        });
+
+        function updateStarRating($ratingContainer, ratingValue) {
+            $ratingContainer.find('.star').each(function() {
+                var currentValue = $(this).data('value');
+                if (currentValue <= ratingValue) {
+                    $(this).addClass('fas');
+                    $(this).removeClass('far');
+                } else {
+                    $(this).addClass('far');
+                    $(this).removeClass('fas');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
