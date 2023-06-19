@@ -186,3 +186,29 @@ from .models import Booking
 def booking_success(request, booking_id):
     booking = get_object_or_404(Booking, pk=booking_id)
     return render(request, 'booking_success.html', {'booking': booking})
+
+
+
+@login_required
+def edit_service(request, service_id):
+    service = get_object_or_404(Service, id=service_id, user=request.user)
+
+    if request.method == 'POST':
+        form = ServiceForm(request.POST, request.FILES, instance=service)
+        if form.is_valid():
+            form.save()
+            return redirect('service_detail', service_id=service.id)
+    else:
+        form = ServiceForm(instance=service)
+
+    return render(request, 'edit_service.html', {'form': form})
+
+@login_required
+def confirm_delete_service(request, service_id):
+    service = get_object_or_404(Service, id=service_id, user=request.user)
+
+    if request.method == 'POST':
+        service.delete()
+        return redirect('home')
+
+    return render(request, 'confirm_delete_service.html', {'service': service})
