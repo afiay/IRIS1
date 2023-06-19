@@ -65,19 +65,20 @@
 <!-- Display the filtered services -->
 <div class="row">
     {% for service in services %}
-        <div class="col-md-4">
-            <!-- Display service card or any other layout -->
-            <div class="card mb-4">
-                <a href="{% url 'service_detail' service.id %}"> <!-- Replace 'service_detail' with your actual URL name and 'service.id' with the appropriate identifier for the service -->
-                    <div class="card-body">
-                        <h5 class="card-title">{{ service.name }}</h5>
-                        <p class="card-text">Category: {{ service.category }}</p>
-                        <p class="card-text">Participants: {{ service.guest_limit }}</p>
-                        <!-- Add more service details here -->
-                    </div>
-                </a>
+<div class="col-md-4">
+    <div class="card mb-4">
+        <a href="{% url 'service_detail' service.id %}">
+            <img src="{{ service.pictures.url }}" alt="{{ service.name }}" class="card-img-top">
+            <div class="card-body">
+                <h5 class="card-title">{{ service.name }}</h5>
+                <p class="card-text">Category: {{ service.category }}</p>
+                <p class="card-text">Participants: {{ service.guest_limit }}</p>
+                <!-- Add more service details here -->
             </div>
-        </div>
+        </a>
+    </div>
+</div>
+
     {% empty %}
         <div class="col-md-12">
             <p>No services found.</p>
