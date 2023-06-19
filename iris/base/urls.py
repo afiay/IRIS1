@@ -11,6 +11,10 @@ urlpatterns = [
     path('add_service/', views.add_service, name='add_service'),
     path('booking/<int:service_id>/', views.booking, name='booking'),
     path('booking/<int:booking_id>/success/', views.booking_success, name='booking_success'),
+    # Other URL patterns
+    path('service/edit/<int:service_id>/', views.edit_service, name='edit_service'),
+    path('service/delete/<int:service_id>/', views.confirm_delete_service, name='confirm_delete_service'),
+    # Other URL patterns
 
 
 

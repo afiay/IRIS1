@@ -188,10 +188,9 @@ def booking_success(request, booking_id):
     return render(request, 'booking_success.html', {'booking': booking})
 
 
-
 @login_required
 def edit_service(request, service_id):
-    service = get_object_or_404(Service, id=service_id, user=request.user)
+    service = get_object_or_404(Service, id=service_id, created_by=request.user)
 
     if request.method == 'POST':
         form = ServiceForm(request.POST, request.FILES, instance=service)
@@ -205,7 +204,7 @@ def edit_service(request, service_id):
 
 @login_required
 def confirm_delete_service(request, service_id):
-    service = get_object_or_404(Service, id=service_id, user=request.user)
+    service = get_object_or_404(Service, id=service_id, created_by=request.user)
 
     if request.method == 'POST':
         service.delete()
