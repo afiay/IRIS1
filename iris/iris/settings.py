@@ -42,6 +42,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'base',
 ]
+AMADEUS_API_BASE_URL = 'https://test.api.amadeus.com/v1'
+AMADEUS_CLIENT_ID = 'zMTx46EKDnQPDzNUp57mljEwxJ2CzyJR'
+AMADEUS_CLIENT_SECRET = 'al1TGG8fXakUyDyQ'
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
@@ -98,10 +101,11 @@ CORS_EXPOSE_HEADERS = [
 
 CORS_ALLOW_CREDENTIALS = True
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'custom_templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

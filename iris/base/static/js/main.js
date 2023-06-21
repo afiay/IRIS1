@@ -19,3 +19,26 @@
             });
         }
     });
+// Get the SVG element
+const svgElement = document.querySelector('svg');
+
+// Define the animation function
+function animate() {
+  // Reset the animation by removing the 'animated' class
+  svgElement.classList.remove('animated');
+
+  // Trigger reflow to restart the animation
+  void svgElement.offsetWidth;
+
+  // Add the 'animated' class to start the animation
+  svgElement.classList.add('animated');
+}
+
+// Trigger the animation when the page loads
+window.addEventListener('load', animate);
+
+// Listen for animation end event
+svgElement.addEventListener('animationend', () => {
+  // Remove the 'animated' class to reset the animation
+  svgElement.classList.remove('animated');
+});

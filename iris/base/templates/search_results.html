@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form method="GET" action="{% url 'search_flights' %}" class="flight-search-form">
+        <div class="form-group">
+            <label for="origin">Origin:</label>
+            <input type="text" id="origin" name="origin" value="PAR">
+        </div>
+
+        <div class="form-group">
+            <label for="max_price">Max Price:</label>
+            <input type="number" id="max_price" name="max_price" value="200">
+        </div>
+
+        <div class="form-group">
+            <label for="departure_date">Departure Date:</label>
+            <input type="date" id="departure_date" name="departure_date">
+        </div>
+
+        <div class="form-group">
+            <label for="return_date">Return Date:</label>
+            <input type="date" id="return_date" name="return_date">
+        </div>
+
+        <button type="submit" class="search-button">Search</button>
+    </form>
+
+    {% if flights %}
+        <ul class="flight-list">
+            {% for flight in flights %}
+                <li class="flight-card">
+                    <div class="flight-details">
+                        <div class="flight-location">
+                            <strong>Origin:</strong> {{ flight.origin }}<br>
+                            <strong>Destination:</strong> {{ flight.destination }}<br>
+                        </div>
+                        <div class="flight-dates">
+                            <strong>Departure Date:</strong> {{ flight.departureDate }}<br>
+                            <strong>Return Date:</strong> {{ flight.returnDate }}<br>
+                        </div>
+                        <div class="flight-price">
+                            <strong>Price:</strong> {{ flight.price.total }}<br>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No flights found.</p>
+    {% endif %}
+{% endblock %}

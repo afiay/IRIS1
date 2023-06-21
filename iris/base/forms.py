@@ -5,7 +5,7 @@ class ServiceForm(forms.ModelForm):
     class Meta:
         model = Service
         fields = ['name', 'category', 'country', 'address', 'latitude', 'longitude', 'pictures', 'cover_picture',
-                  'available_from', 'available_to', 'guest_limit']
+                  'available_from', 'available_to', 'guest_limit', 'price']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'category': forms.TextInput(attrs={'class': 'form-control'}),
@@ -32,20 +32,12 @@ class RatingForm(forms.ModelForm):
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
-        fields = ['service', 'user', 'from_date', 'to_date']
+        fields = ['service', 'user', 'from_date', 'to_date', 'participants']
         widgets = {
             'service': forms.HiddenInput(),
             'user': forms.HiddenInput(),
             'from_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'to_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'participants': forms.NumberInput(attrs={'class': 'form-control'}),
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
-        from_date = cleaned_data.get('from_date')
-        to_date = cleaned_data.get('to_date')
-
-        if from_date and to_date and from_date > to_date:
-            raise forms.ValidationError("The 'from' date must be before the 'to' date.")
-
-        return cleaned_data

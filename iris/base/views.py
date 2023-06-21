@@ -1,3 +1,4 @@
+import amadeus
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
@@ -6,8 +7,78 @@ from .forms import BookingForm, RatingForm
 from django.utils import timezone
 from .forms import ServiceForm
 from datetime import datetime
+from django.conf import settings
+from amadeus import Client, ResponseError
+from django.shortcuts import render
+
+import requests
+from django.conf import settings
+from django.shortcuts import render
+from requests.exceptions import HTTPError, ConnectionError
+# views.py
+
+from django.shortcuts import render
+
+def book_flight(request, flight_id):
+    # Perform the booking process using the provided flight_id
+    # ...
+
+    # Render the booking confirmation template
+    return render(request, 'booking_confirmation.html', {'flight_id': flight_id})
 
 
+def get_access_token():
+    token_url = f'{settings.AMADEUS_API_BASE_URL}/security/oauth2/token'
+    data = {
+        'grant_type': 'client_credentials',
+        'client_id': settings.AMADEUS_CLIENT_ID,
+        'client_secret': settings.AMADEUS_CLIENT_SECRET
+    }
+    response = requests.post(token_url, data=data)
+    response.raise_for_status()
+    return response.json()['access_token']
+
+def search_flights(request):
+    try:
+        access_token = get_access_token()
+
+        if request.method == 'GET':
+            origin = request.GET.get('origin', 'PAR')  # Default origin is 'ARN'
+            max_price = request.GET.get('max_price', 200)  # Default max price is 200
+            departure_date = request.GET.get('departure_date')
+            return_date = request.GET.get('return_date')
+
+            destinations_url = f'{settings.AMADEUS_API_BASE_URL}/shopping/flight-destinations'
+            params = {
+                'origin': origin,
+                'maxPrice': max_price
+            }
+
+            if departure_date:
+                params['departureDate'] = departure_date
+
+            if return_date:
+                params['returnDate'] = return_date
+
+            headers = {
+                'Authorization': f'Bearer {access_token}'
+            }
+
+            response = requests.get(destinations_url, params=params, headers=headers)
+            response.raise_for_status()
+
+            flights = response.json()['data']
+            return render(request, 'search_results.html', {'flights': flights})
+
+    except HTTPError as error:
+        return render(request, 'error.html', {'error': str(error)})
+
+    except ConnectionError as error:
+        return render(request, 'error.html', {'error': 'Connection Error. Please try again later.'})
+
+
+
+    
 @login_required
 def add_service(request):
     if request.method == 'POST':
@@ -154,7 +225,10 @@ def add_rating(request, service_id):
         rating_form = RatingForm()
 
     return render(request, 'add_rating.html', {'service': service, 'rating_form': rating_form})
-
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import BookingForm
+from .models import Booking, Service
+from django.http import HttpResponse
 
 def booking(request, service_id):
     service = get_object_or_404(Service, pk=service_id)
@@ -162,21 +236,17 @@ def booking(request, service_id):
     if request.method == 'POST':
         booking_form = BookingForm(request.POST, initial={'service': service})
         if booking_form.is_valid():
-            # Process the booking
             booking = booking_form.save(commit=False)
             booking.service = service
             booking.user = request.user
+            booking.full_clean()
             booking.save()
-            service.availability = False
-            service.save()
             return redirect('booking_success', booking_id=booking.id)
     else:
         booking_form = BookingForm(initial={'service': service})
 
-    if service.availability:
-        return render(request, 'booking.html', {'booking_form': booking_form, 'service': service})
-    else:
-        return HttpResponse("Service is not currently available for booking.")
+    return render(request, 'booking.html', {'booking_form': booking_form, 'service': service})
+
 
 
 from django.shortcuts import render, get_object_or_404
@@ -211,3 +281,11 @@ def confirm_delete_service(request, service_id):
         return redirect('home')
 
     return render(request, 'confirm_delete_service.html', {'service': service})
+
+@login_required
+def my_bookings(request):
+    user = request.user
+    services = Service.objects.filter(created_by=user)
+    bookings = Booking.objects.filter(service__in=services)
+
+    return render(request, 'my_bookings.html', {'bookings': bookings})

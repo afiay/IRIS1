@@ -14,8 +14,7 @@ urlpatterns = [
     # Other URL patterns
     path('service/edit/<int:service_id>/', views.edit_service, name='edit_service'),
     path('service/delete/<int:service_id>/', views.confirm_delete_service, name='confirm_delete_service'),
-    # Other URL patterns
-
-
+    path('flights/search/', views.search_flights, name='search_flights'),
+    path('my_bookings/', views.my_bookings, name='my_bookings'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

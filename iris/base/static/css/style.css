@@ -1,72 +1,159 @@
-        /* Add your custom styles here */
-        body {
-            padding-top: 0px;
-            font-family: 'Roboto', sans-serif;
-            font-size: 12px;
-            text-align: justify;
-            word-wrap: break-word;
-        }
+    body {
+        padding-top: 0px;
+        font-family: 'Roboto', sans-serif;
+        font-size: 12px;
+        text-align: justify;
+        word-wrap: break-word;
+    }
 
-        header {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-        }
+    header {
+        background-color: #333;
+        color: #fff;
+        padding: 10px;
+    }
 
-        footer {
-            background-color: #f5f5f5;
-            padding: 10px;
-            text-align: center;
-        }
+    footer {
+        background-color: #f5f5f5;
+        padding: 10px;
+        text-align: center;
+    }
 
-        .profile-picture {
-            width: 200px;
-            height: 200px;
-            border: 2px solid #fff;
-            margin: 10px 10px 10px 10px;
-        }
+    .profile-picture {
+        width: 200px;
+        height: 200px;
+        border: 2px solid #fff;
+        margin: 10px 10px 10px 10px;
+    }
 
-        .star-rating {
-            display: inline-block;
-        }
+    .star-rating {
+        display: inline-block;
+    }
 
-        .star-rating .star {
-            font-size: 20px;
-            color: #ccc;
-            cursor: pointer;
-        }
+    .star-rating .star {
+        font-size: 20px;
+        color: #ccc;
+        cursor: pointer;
+    }
 
-        .star-rating .star.filled {
-            color: orange;
-        }
+    .star-rating .star.filled {
+        color: orange;
+    }
 
-        .cover-picture {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            object-position: center;
-            overflow: hidden;
-        }
+    .cover-picture {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        object-position: center;
+        overflow: hidden;
+    }
 
-        .col-md-8 {
-            padding-top: 10px
-        }
-        .flower {
-            color: white;
-        }
-        .col-md-4 {
-            padding-top: 10px
-        }
-                /* Add Service Form */
-        .add_service {
-            margin-top: 20px;
-            background-color: aqua;
-        }
+    .col-md-8 {
+        padding-top: 10px;
+    }
 
-                .container_2 {
-                    /* Add your custom CSS styles for the container here */
-                    /* For example: */
-                    max-width: 500px;
-                    margin: 0 auto;
-                    padding: 20px;
-                }
+    .flower {
+        color: white;
+    }
+
+    .col-md-4 {
+        padding-top: 10px;
+    }
+
+    /* Add Service Form */
+    .add_service {
+        margin-top: 20px;
+        background-color: aqua;
+    }
+
+    .container_2 {
+        /* Add your custom CSS styles for the container here */
+        /* For example: */
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .card {
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+    }
+
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .card-body {
+        padding: 16px;
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+
+    .card-text {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 4px;
+    }
+.flight-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.flight-card {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background-color: #f8f8f8;
+}
+
+.flight-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flight-location {
+    flex-basis: 40%;
+}
+
+.flight-dates {
+    flex-basis: 30%;
+}
+
+.flight-price {
+    flex-basis: 20%;
+    text-align: right;
+    font-weight: bold;
+}
+
+.bookings-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bookings-table th, .bookings-table td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.bookings-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.bookings-table tbody tr:hover {
+  background-color: #f9f9f9;
+}
