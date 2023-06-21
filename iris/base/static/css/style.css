@@ -157,3 +157,14 @@
 .bookings-table tbody tr:hover {
   background-color: #f9f9f9;
 }
+
+.carousel-item {
+    height: 200px;
+}
+
+.hotel-logo {
+    width: 200px;
+    height: 200px;
+    border: 2px solid #fff;
+    margin: 10px 10px 10px 10px;
+}

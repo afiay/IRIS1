@@ -42,3 +42,6 @@ svgElement.addEventListener('animationend', () => {
   // Remove the 'animated' class to reset the animation
   svgElement.classList.remove('animated');
 });
+    $(document).ready(function () {
+        $('#hotelPicturesCarousel').carousel();
+    });

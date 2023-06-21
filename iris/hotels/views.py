@@ -80,10 +80,14 @@ def room_details(request, room_id):
     return render(request, 'room_details.html', {'room': room})
 
 
-def room_list(request):
-    rooms = Room.objects.all()
+def room_list(request, hotel_id=None):
+    if hotel_id:
+        hotel = get_object_or_404(Hotel, pk=hotel_id)
+        rooms = hotel.rooms.all()
+    else:
+        rooms = Room.objects.all()
+    
     return render(request, 'room_list.html', {'rooms': rooms})
-
 
 def room_add(request, hotel_id):
     hotel = get_object_or_404(Hotel, pk=hotel_id)
@@ -92,13 +96,14 @@ def room_add(request, hotel_id):
         form = RoomForm(request.POST)
         if form.is_valid():
             room = form.save(commit=False)
-            room.hotel = hotel
+            room.hotel = hotel  # Associate the room with the specified hotel
             room.save()
-            return redirect('room_list')
+            return redirect('room_list', hotel_id=hotel_id)
     else:
         form = RoomForm()
 
     return render(request, 'room_add.html', {'form': form, 'hotel': hotel})
+
 
 
 def room_edit(request, room_id):

@@ -3,18 +3,24 @@
 {% block content %}
   <h2>Hotels</h2>
   {% if hotels %}
-    <ul>
+    <div class="hotel-card-container">
       {% for hotel in hotels %}
-        <li>
-          <a href="{% url 'hotel_details' hotel.id %}">{{ hotel.name }}</a> - 
-          <a href="{% url 'edit_hotel' hotel.id %}">Edit</a> - 
-          <a href="{% url 'delete_hotel' hotel.id %}">Delete</a>
-        </li>
+        <div class="hotel-card">
+          <div class="hotel-card-header">
+            <a href="{% url 'hotel_details' hotel.id %}">{{ hotel.name }}</a>
+          </div>
+          <div class="hotel-card-body">
+            <!-- Add additional hotel details here if needed -->
+          </div>
+          <div class="hotel-card-footer">
+            <a href="{% url 'edit_hotel' hotel.id %}">Edit</a>
+            <a href="{% url 'delete_hotel' hotel.id %}">Delete</a>
+          </div>
+        </div>
       {% endfor %}
-    </ul>
+    </div>
   {% else %}
     <p>No hotels found.</p>
   {% endif %}
-  <a href="{% url 'add_hotel' %}">Add a Hotel</a>
-
+  <a href="{% url 'add_hotel' %}" class="add-hotel-link">Add a Hotel</a>
 {% endblock %}
