@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'base',
+    'hotels',
 ]
 AMADEUS_API_BASE_URL = 'https://test.api.amadeus.com/v1'
 AMADEUS_CLIENT_ID = 'zMTx46EKDnQPDzNUp57mljEwxJ2CzyJR'

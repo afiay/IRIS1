@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Room Details</h2>
+  <table>
+    <tr>
+      <th>Room Number:</th>
+      <td>{{ room.number }}</td>
+    </tr>
+    <tr>
+      <th>Hotel:</th>
+      <td>{{ room.hotel.name }}</td>
+    </tr>
+    <tr>
+      <th>Capacity:</th>
+      <td>{{ room.capacity }}</td>
+    </tr>
+    <tr>
+      <th>Price per Night:</th>
+      <td>{{ room.price_per_night }}</td>
+    </tr>
+    <!-- Add more room details if needed -->
+  </table>
+{% endblock %}

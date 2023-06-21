@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>{{ hotel.name }}</h2>
+  <p><strong>Address:</strong> {{ hotel.address }}</p>
+  <!-- Include other hotel details here -->
+  <!-- List Rooms -->
+<a href="{% url 'room_list' %}">List Rooms</a>
+
+<!-- Add Room -->
+
+<!-- Edit Room -->
+
+<!-- Room Details -->
+<a href="{% url 'room_add' hotel_id=hotel.id %}">Room Details</a>
+<a href="{% url 'room_list' %}">List Rooms</a>
+
+{% endblock %}
