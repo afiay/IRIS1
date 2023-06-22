@@ -72,7 +72,35 @@ def delete_hotel(request, hotel_id):
 
 def hotel_details(request, hotel_id):
     hotel = get_object_or_404(Hotel, pk=hotel_id)
-    return render(request, 'hotel_details.html', {'hotel': hotel})
+    amenities = [
+        [
+            {'icon': 'fas fa-swimming-pool', 'name': 'Pool'},
+            {'icon': 'fas fa-dumbbell', 'name': 'Gym'},
+            {'icon': 'fas fa-spa', 'name': 'Spa'},
+            {'icon': 'fas fa-utensils', 'name': 'Restaurant'},
+            {'icon': 'fas fa-wifi', 'name': 'Free Wi-Fi'},
+            {'icon': 'fas fa-parking', 'name': 'Parking'},
+            {'icon': 'fas fa-chalkboard-teacher', 'name': 'Conference Facilities'},
+            {'icon': 'fas fa-concierge-bell', 'name': 'Room Service'},
+            {'icon': 'fas fa-glass-martini', 'name': 'Bar'},
+        ],
+        [
+            {'icon': 'fas fa-dumbbell', 'name': 'Fitness Center'},
+            {'icon': 'fas fa-briefcase', 'name': 'Business Center'},
+            {'icon': 'fas fa-tshirt', 'name': 'Laundry Service'},
+            {'icon': 'fas fa-baby', 'name': 'Childcare'},
+            {'icon': 'fas fa-swimming-pool', 'name': 'Swimming Pool'},
+            {'icon': 'fas fa-hot-tub', 'name': 'Hot Tub'},
+            {'icon': 'fas fa-spa', 'name': 'Sauna'},
+            {'icon': 'fas fa-clock', 'name': '24-Hour Front Desk'},
+            {'icon': 'fas fa-shuttle-van', 'name': 'Airport Shuttle'},
+            {'icon': 'fas fa-car', 'name': 'Car Rental'},
+            {'icon': 'fas fa-money-bill-wave', 'name': 'Currency Exchange'},
+        ]
+        # Add more amenity groups as needed
+    ]
+    return render(request, 'hotel_details.html', {'hotel': hotel, 'amenities': amenities})
+
 
 
 def room_details(request, room_id):

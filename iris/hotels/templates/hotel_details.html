@@ -5,50 +5,19 @@
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-
-            <!-- Place the carousel for hotel pictures -->
-            <div id="hotelPicturesCarousel" class="carousel slide" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
-                        <img src="{{ hotel.cover_picture.url }}" alt="Cover Picture" class="d-block w-100">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="{{ hotel.picture1.url }}" alt="Picture 1" class="d-block w-100">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="{{ hotel.picture2.url }}" alt="Picture 2" class="d-block w-100">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="{{ hotel.picture3.url }}" alt="Picture 3" class="d-block w-100">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="{{ hotel.picture4.url }}" alt="Picture 4" class="d-block w-100">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="{{ hotel.picture5.url }}" alt="Picture 5" class="d-block w-100">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="{{ hotel.picture6.url }}" alt="Picture 6" class="d-block w-100">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="{{ hotel.picture7.url }}" alt="Picture 7" class="d-block w-100">
-                    </div>
-                    <div class="carousel-item">
-                        <img src="{{ hotel.picture8.url }}" alt="Picture 8" class="d-block w-100">
-                    </div>
+            <div class="hotel_header">
+                <div class="cover-picture-container" style="background-image: url('{{ hotel.cover_picture.url }}')">
+                    <img src="{{ hotel.hotel_logo.url }}" alt="Hotel Logo" class="card-img rounded-circle profile-picture">
                 </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#hotelPicturesCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#hotelPicturesCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-                <img src="{{ hotel.logo.url }}" alt="Hotel Logo" class="hotel-logo rounded-circle">
             </div>
         </div>
     </div>
+    <h3>Hotel Description:</h3>
+    <div class="card-body">
+        <h2 class="card-title">{{ hotel.name }}</h2>
+        <p class="card-text">{{ hotel.description }}</p>
+    </div>
+    <hr>
     <div class="row">
         <div class="col-md-4">
             <div class="card">
@@ -63,41 +32,100 @@
         </div>
         <div class="col-md-8">
             <div class="card">
-                <div class="card-body">
-                    <h2 class="card-title">{{ hotel.name }}</h2>
-                    <p class="card-text">{{ hotel.description }}</p>
-                </div>
-            </div>
-
-            <h3>Rooms:</h3>
-            <ul class="list-group">
-                {% for room in hotel.rooms.all %}
-                <li class="list-group-item">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <!-- Place the room picture as an image within the card -->
-                            <img src="{{ room.picture.url }}" alt="Room Image" class="card-img">
-                        </div>
-                        <div class="col-md-8">
-                            <h5 class="card-title">Room {{ room.number }}</h5>
-                            <p class="card-text">Capacity: {{ room.capacity }}</p>
-                            <p class="card-text">Price per Night: {{ room.price_per_night }}</p>
-                            <a href="{% url 'room_details' room.id %}" class="btn btn-primary">View Details</a>
-                            <!-- Add Edit and Delete buttons for the room if required -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="album py-5 bg-light">
+                            <div class="container">
+                                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                                    <div class="col">
+                                        <div class="card shadow-sm">
+                                            <a href="{{ hotel.picture1.url }}" data-lightbox="gallery" data-title="Picture 1">
+                                                <img src="{{ hotel.picture1.url }}" alt="Picture 1" class="bd-placeholder-img card-img-top">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="card shadow-sm">
+                                            <a href="{{ hotel.picture2.url }}" data-lightbox="gallery" data-title="Picture 2">
+                                                <img src="{{ hotel.picture2.url }}" alt="Picture 2" class="bd-placeholder-img card-img-top">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="card shadow-sm">
+                                            <a href="{{ hotel.picture3.url }}" data-lightbox="gallery" data-title="Picture 2">
+                                                <img src="{{ hotel.picture3.url }}" alt="Picture 2" class="bd-placeholder-img card-img-top">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="card shadow-sm">
+                                            <a href="{{ hotel.picture4.url }}" data-lightbox="gallery" data-title="Picture 1">
+                                                <img src="{{ hotel.picture4.url }}" alt="Picture 1" class="bd-placeholder-img card-img-top">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="card shadow-sm">
+                                            <a href="{{ hotel.picture5.url }}" data-lightbox="gallery" data-title="Picture 2">
+                                                <img src="{{ hotel.picture5.url }}" alt="Picture 2" class="bd-placeholder-img card-img-top">
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col">
+                                        <div class="card shadow-sm">
+                                            <a href="{{ hotel.picture6.url }}" data-lightbox="gallery" data-title="Picture 2">
+                                                <img src="{{ hotel.picture6.url }}" alt="Picture 2" class="bd-placeholder-img card-img-top">
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </li>
-                {% empty %}
-                <li class="list-group-item">No rooms available for this hotel.</li>
-                {% endfor %}
-            </ul>
-
-            <a href="{% url 'room_add' hotel_id=hotel.id %}" class="btn btn-primary">Add Room</a>
-
+                </div>
+                <hr>
+                <h3>Amenities:</h3>
+                <div class="card-body">
+                    <div class="row">
+                        {% for amenity in amenities %}
+                            <div class="col-md-6">
+                                <ul class="list-unstyled">
+                                    {% for item in amenity %}
+                                        <li><i class="{{ item.icon }}"></i> {{ item.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <h3>Rooms:</h3>
+                <ul class="list-group">
+                    {% for room in hotel.rooms.all %}
+                        <li class="list-group-item">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <!-- Place the room picture as an image within the card -->
+                                    <img src="{{ room.picture.url }}" alt="Room Image" class="card-img">
+                                </div>
+                                <div class="col-md-8">
+                                    <h5 class="card-title">Room {{ room.number }}</h5>
+                                    <p class="card-text">Capacity: {{ room.capacity }}</p>
+                                    <p class="card-text">Price per Night: {{ room.price_per_night }}</p>
+                                    <a href="{% url 'room_details' room.id %}" class="btn btn-primary">View Details</a>
+                                    <!-- Add Edit and Delete buttons for the room if required -->
+                                </div>
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item">No rooms available for this hotel.</li>
+                    {% endfor %}
+                </ul>
+                <a href="{% url 'room_add' hotel_id=hotel.id %}" class="btn btn-primary">Add Room</a>
+            </div>
         </div>
     </div>
 </div>
-
 <!-- Required Bootstrap and jQuery libraries -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.5.0/js/bootstrap.bundle.min.js"></script>
