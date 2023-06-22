@@ -1,6 +1,6 @@
+from django.conf import settings
 from django.db import models
-from django.contrib.auth.models import User
-
+from authenticate.models import User
 
 class Hotel(models.Model):
     name = models.CharField(max_length=100)
@@ -63,7 +63,7 @@ class Room(models.Model):
 
 class Booking(models.Model):
     room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='bookings')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='hotel_bookings')
     check_in_date = models.DateField()
     check_out_date = models.DateField()
     guests = models.PositiveIntegerField()

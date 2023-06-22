@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Avg, Sum
@@ -14,7 +15,7 @@ class Service(models.Model):
     available_from = models.DateField()
     available_to = models.DateField()
     guest_limit = models.PositiveIntegerField()
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     availability = models.BooleanField(default=True, null=True, blank=True)
     cover_picture = models.ImageField(upload_to='media/service_covers/')
     service_description = models.TextField()
@@ -34,7 +35,7 @@ class Service(models.Model):
 
 class Rating(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, related_name='ratings')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     rating = models.IntegerField(choices=((1, '1 Star'), (2, '2 Stars'), (3, '3 Stars'), (4, '4 Stars'), (5, '5 Stars')))
     comment = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -44,7 +45,7 @@ class Rating(models.Model):
 from django.core.exceptions import ValidationError
 class Booking(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, null=True, blank=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='base_bookings')
     from_date = models.DateField()
     to_date = models.DateField()
     participants = models.PositiveIntegerField()

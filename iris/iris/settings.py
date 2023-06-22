@@ -42,7 +42,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'base',
     'hotels',
+    'authenticate',
 ]
+
+AUTH_USER_MODEL = 'authenticate.User'
+LOGIN_URL = '/login/'
+
 AMADEUS_API_BASE_URL = 'https://test.api.amadeus.com/v1'
 AMADEUS_CLIENT_ID = 'zMTx46EKDnQPDzNUp57mljEwxJ2CzyJR'
 AMADEUS_CLIENT_SECRET = 'al1TGG8fXakUyDyQ'
