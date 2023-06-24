@@ -75,10 +75,7 @@ def search_flights(request):
 
     except ConnectionError as error:
         return render(request, 'error.html', {'error': 'Connection Error. Please try again later.'})
-
-
-
-    
+  
 @login_required
 def add_service(request):
     if request.method == 'POST':

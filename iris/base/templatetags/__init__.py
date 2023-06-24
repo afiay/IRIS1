@@ -1,1 +1,1 @@
-from . import custom_filters
+from . import hotels_custom_filters

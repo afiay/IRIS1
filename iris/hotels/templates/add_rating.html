@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container">
+    <h1>Add Rating</h1>
+    <form method="POST" action="{% url 'add_rating' hotel.id %}">
+      {% csrf_token %}
+      {{ rating_form.as_p }}
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+{% endblock %}

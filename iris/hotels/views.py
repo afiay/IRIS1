@@ -1,9 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Hotel, Room, Booking
-from .forms import BookingForm, RoomForm, HotelForm
+from .models import Hotel, HotelRating, Room, Booking
+from .forms import BookingForm, RatingForm, RoomForm, HotelForm
+from django.db.models import Avg
 
 
+from django.contrib.auth.decorators import login_required 
 
+@login_required
 def room_list(request, hotel_id=None):
     if hotel_id:
         hotel = get_object_or_404(Hotel, pk=hotel_id)
@@ -17,6 +20,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .forms import BookingForm
 from .models import Room
 
+@login_required
 def booking(request, room_id):
     room = get_object_or_404(Room, pk=room_id)
 
@@ -33,8 +37,7 @@ def booking(request, room_id):
 
     return render(request, 'booking.html', {'room': room, 'booking_form': booking_form})
 
-
-
+@login_required
 def booking_success(request, booking_id):
     booking = get_object_or_404(Booking, pk=booking_id)
     return render(request, 'booking_success.html', {'booking': booking})
@@ -42,6 +45,7 @@ def booking_success(request, booking_id):
 
 from django.db.models import Q
 
+@login_required
 def hotel_list(request):
     date_from = request.GET.get('date_from')
     date_to = request.GET.get('date_to')
@@ -72,7 +76,7 @@ def hotel_list(request):
     return render(request, 'hotel_list.html', context)
 
 
-
+@login_required
 def add_hotel(request):
     if request.method == 'POST':
         form = HotelForm(request.POST)
@@ -84,7 +88,7 @@ def add_hotel(request):
 
     return render(request, 'add_hotel.html', {'form': form})
 
-
+@login_required
 def edit_hotel(request, hotel_id):
     hotel = get_object_or_404(Hotel, pk=hotel_id)
     if request.method == 'POST':
@@ -97,7 +101,7 @@ def edit_hotel(request, hotel_id):
 
     return render(request, 'edit_hotel.html', {'form': form, 'hotel': hotel})
 
-
+@login_required
 def delete_hotel(request, hotel_id):
     hotel = get_object_or_404(Hotel, pk=hotel_id)
     if request.method == 'POST':
@@ -105,42 +109,93 @@ def delete_hotel(request, hotel_id):
         return redirect('hotel_list')
 
     return render(request, 'delete_hotel.html', {'hotel': hotel})
+def get_rating_form(hotel, user):
+    if not HotelRating.objects.filter(hotel=hotel, user=user).exists():
+        return RatingForm()
+    return None
 
 
+
+
+from django.shortcuts import reverse
+
+from .forms import RatingForm
+
+@login_required
+def add_rating_hotel(request, hotel_id):
+    hotel = get_object_or_404(Hotel, pk=hotel_id)
+    user = request.user
+
+    # Check if the user has already rated the hotel
+    if HotelRating.objects.filter(hotel=hotel, user=user).exists():
+        return redirect('hotel_details', hotel_id=hotel_id)
+
+    if request.method == 'POST':
+        rating_form = RatingForm(request.POST)
+        if rating_form.is_valid():
+            rating = rating_form.save(commit=False)
+            rating.hotel = hotel
+            rating.user = user
+            rating.save()
+            return redirect('hotel_detail', hotel_id=hotel_id)
+    else:
+        rating_form = RatingForm()
+
+    return render(request, 'add_rating.html', {'hotel': hotel, 'rating_form': rating_form})
+
+
+
+def check_booking_availability(hotel, booking_form):
+    if not hotel.availability:
+        return False
+
+    if booking_form.is_bound and booking_form.is_valid():
+        from_date = booking_form.cleaned_data['from_date']
+        to_date = booking_form.cleaned_data['to_date']
+        
+        if not hotel.is_date_range_available(from_date, to_date):
+            booking_form.add_error('from_date', 'The selected dates are not available for booking.')
+        else:
+            return True
+
+@login_required
 def hotel_details(request, hotel_id):
     hotel = get_object_or_404(Hotel, pk=hotel_id)
-    amenities = [
-        [
-            {'icon': 'fas fa-swimming-pool', 'name': 'Pool'},
-            {'icon': 'fas fa-dumbbell', 'name': 'Gym'},
-            {'icon': 'fas fa-spa', 'name': 'Spa'},
-            {'icon': 'fas fa-utensils', 'name': 'Restaurant'},
-            {'icon': 'fas fa-wifi', 'name': 'Free Wi-Fi'},
-            {'icon': 'fas fa-parking', 'name': 'Parking'},
-            {'icon': 'fas fa-chalkboard-teacher', 'name': 'Conference Facilities'},
-            {'icon': 'fas fa-concierge-bell', 'name': 'Room Service'},
-            {'icon': 'fas fa-glass-martini', 'name': 'Bar'},
-        ],
-        [
-            {'icon': 'fas fa-dumbbell', 'name': 'Fitness Center'},
-            {'icon': 'fas fa-briefcase', 'name': 'Business Center'},
-            {'icon': 'fas fa-tshirt', 'name': 'Laundry Service'},
-            {'icon': 'fas fa-baby', 'name': 'Childcare'},
-            {'icon': 'fas fa-swimming-pool', 'name': 'Swimming Pool'},
-            {'icon': 'fas fa-hot-tub', 'name': 'Hot Tub'},
-            {'icon': 'fas fa-spa', 'name': 'Sauna'},
-            {'icon': 'fas fa-clock', 'name': '24-Hour Front Desk'},
-            {'icon': 'fas fa-shuttle-van', 'name': 'Airport Shuttle'},
-            {'icon': 'fas fa-car', 'name': 'Car Rental'},
-            {'icon': 'fas fa-money-bill-wave', 'name': 'Currency Exchange'},
-        ]
-        # Add more amenity groups as needed
-    ]
-    return render(request, 'hotel_details.html', {'hotel': hotel, 'amenities': amenities})
+    ratings = hotel.ratings.all()
+    booking_form = BookingForm()
+    rating_form = get_rating_form(hotel, request.user)
+    
+    if request.method == 'POST':
+        booking_form = BookingForm(request.POST)
+        if check_booking_availability(hotel, booking_form):
+            booking = booking_form.save(commit=False)
+            booking.hotel = hotel
+            booking.user = request.user
+            booking.save()
+            hotel.availability = False
+            hotel.save()
+            return redirect('hotel_details', hotel_id=hotel_id)
+
+    # Calculate the average rating using Django's Avg function
+    average_rating = ratings.aggregate(Avg('rating'))['rating__avg']
+
+    if request.method == 'POST' and 'cover_picture' in request.FILES:
+        cover_picture = request.FILES['cover_picture']
+        hotel.cover_picture = cover_picture
+        hotel.save()
+
+    return render(request, 'hotel_details.html', {
+        'hotel': hotel,
+        'ratings': ratings,
+        'rating_form': rating_form,
+        'booking_form': booking_form,
+        'average_rating': average_rating,
+    })
 
 
 
 
+@login_required
 def room_details(request, room_id):
     room = get_object_or_404(Room, pk=room_id)
     form = BookingForm()
@@ -162,7 +217,7 @@ def room_details(request, room_id):
 
     return render(request, 'room_details.html', context)
 
-
+@login_required
 def room_list(request, hotel_id=None):
     if hotel_id:
         hotel = get_object_or_404(Hotel, pk=hotel_id)
@@ -172,6 +227,7 @@ def room_list(request, hotel_id=None):
     
     return render(request, 'room_list.html', {'rooms': rooms})
 
+@login_required
 def room_add(request, hotel_id):
     hotel = get_object_or_404(Hotel, pk=hotel_id)
 
@@ -187,8 +243,7 @@ def room_add(request, hotel_id):
 
     return render(request, 'room_add.html', {'form': form, 'hotel': hotel})
 
-
-
+@login_required
 def room_edit(request, room_id):
     room = get_object_or_404(Room, pk=room_id)
     hotel = room.hotel
@@ -203,7 +258,7 @@ def room_edit(request, room_id):
 
     return render(request, 'room_edit.html', {'form': form, 'room': room, 'hotel': hotel})
 
-
+@login_required
 def room_availability(request, room_id):
     room = get_object_or_404(Room, id=room_id)
     availabilities = room.availabilities.all()
@@ -220,5 +275,4 @@ def room_availability(request, room_id):
         'date_from': date_from,
         'date_to': date_to
     }
-
     return render(request, 'availability.html', context)

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Booking, Room
+from .models import Booking, HotelRating, Room
 
 class BookingForm(forms.ModelForm):
     class Meta:
@@ -51,4 +51,15 @@ class RoomForm(forms.ModelForm):
             'number': forms.TextInput(attrs={'class': 'form-control'}),
             'capacity': forms.NumberInput(attrs={'class': 'form-control'}),
             'price_per_night': forms.NumberInput(attrs={'class': 'form-control'}),
+        }
+class RatingForm(forms.ModelForm):
+    class Meta:
+        model = HotelRating
+        fields = ['rating', 'comment']
+        labels = {
+            'rating': 'Rating',
+            'comment': 'Comment',
+        }
+        widgets = {
+            'comment': forms.Textarea(attrs={'rows': 4}),
         }

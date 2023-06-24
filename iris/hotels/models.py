@@ -84,3 +84,13 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"Booking ID: {self.id} - Room: {self.room.number} - {self.user.username}"
+
+
+class HotelRating(models.Model):
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='ratings')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    rating = models.IntegerField(choices=((1, '1 Star'), (2, '2 Stars'), (3, '3 Stars'), (4, '4 Stars'), (5, '5 Stars')))
+    comment = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f"{self.service.name}: {self.rating}"

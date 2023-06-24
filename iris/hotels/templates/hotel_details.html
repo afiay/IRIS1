@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% load hotels_custom_filters %}
 
 <div class="container">
     <div class="row">
@@ -12,7 +13,6 @@
             </div>
         </div>
     </div>
-    <h3>Hotel Description:</h3>
     <div class="card-body">
         <h2 class="card-title">{{ hotel.name }}</h2>
         <p class="card-text">{{ hotel.description }}</p>
@@ -25,8 +25,57 @@
                     <h5 class="card-title">{{ hotel.name }}</h5>
                     <p class="card-text"><strong>Address:</strong> {{ hotel.address }}</p>
                     <!-- Include other hotel details here -->
-                    <a href="{% url 'edit_hotel' hotel.id %}" class="btn btn-secondary">Edit</a>
-                    <a href="{% url 'delete_hotel' hotel.id %}" class="btn btn-danger">Delete</a>
+                    {% if hotel.user == request.user %}
+                        <a href="{% url 'edit_hotel' hotel.id %}" class="btn btn-secondary">Edit</a>
+                        <a href="{% url 'delete_hotel' hotel.id %}" class="btn btn-danger">Delete</a>
+                    {% endif %}
+                    <ul class="list-group">
+                        {% for rating in ratings %}
+                            <li class="list-group-item">
+                                <div class="rating">
+                                    {% for _ in rating.rating|get_range %}
+                                        <i class="fas fa-star"></i>
+                                    {% endfor %}
+                                </div>
+                                <div class="rating-details">
+                                    <p class="comment">{{ rating.comment }}</p>
+                                    <p class="posted-by">Rated by: {{ rating.user.username }}</p>
+                                    <p class="date">Date: {{ rating.timestamp }}</p>
+                                </div>
+                            </li>
+                        {% empty %}
+                            <li class="list-group-item">No ratings yet.</li>
+                        {% endfor %}
+                    </ul>
+                    {% if request.user.is_authenticated %}
+                        {% if rating_form %}
+                            <div class="card mt-4">
+                                <div class="card-body">
+                                    <h3>Add Rating</h3>
+                                    <form method="post" action="{% url 'add_rating_hotel' hotel.id %}">
+                                        {% csrf_token %}
+                                        <div class="star-rating">
+                                            <input type="hidden" name="rating" value="">
+                                            <span class="star" data-value="1"><i class="fas fa-star"></i></span>
+                                            <span class="star" data-value="2"><i class="fas fa-star"></i></span>
+                                            <span class="star" data-value="3"><i class="fas fa-star"></i></span>
+                                            <span class="star" data-value="4"><i class="fas fa-star"></i></span>
+                                            <span class="star" data-value="5"><i class="fas fa-star"></i></span>
+                                        </div>
+
+                                        <textarea name="comment" class="form-control" placeholder="Comment" rows="4"></textarea>
+                                        <button type="submit" class="btn btn-primary">Submit Rating</button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <p class="text-muted">Please <a href="{% url 'login' %}">login</a> to make a booking or add a rating.</p>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -38,58 +87,58 @@
                             <div class="container">
                                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
                                     {% if hotel.picture1 %}
-                                    <div class="col">
-                                        <div class="card shadow-sm">
-                                            <a href="{{ hotel.picture1.url }}" data-lightbox="gallery" data-title="Picture 1">
-                                                <img src="{{ hotel.picture1.url }}" alt="Picture 1" class="bd-placeholder-img card-img-top">
-                                            </a>
+                                        <div class="col">
+                                            <div class="card shadow-sm">
+                                                <a href="{{ hotel.picture1.url }}" data-lightbox="gallery" data-title="Picture 1">
+                                                    <img src="{{ hotel.picture1.url }}" alt="Picture 1" class="bd-placeholder-img card-img-top">
+                                                </a>
+                                            </div>
                                         </div>
-                                    </div>
                                     {% endif %}
                                     {% if hotel.picture2 %}
-                                    <div class="col">
-                                        <div class="card shadow-sm">
-                                            <a href="{{ hotel.picture2.url }}" data-lightbox="gallery" data-title="Picture 2">
-                                                <img src="{{ hotel.picture2.url }}" alt="Picture 2" class="bd-placeholder-img card-img-top">
-                                            </a>
+                                        <div class="col">
+                                            <div class="card shadow-sm">
+                                                <a href="{{ hotel.picture2.url }}" data-lightbox="gallery" data-title="Picture 2">
+                                                    <img src="{{ hotel.picture2.url }}" alt="Picture 2" class="bd-placeholder-img card-img-top">
+                                                </a>
+                                            </div>
                                         </div>
-                                    </div>
                                     {% endif %}
                                     {% if hotel.picture3 %}
-                                    <div class="col">
-                                        <div class="card shadow-sm">
-                                            <a href="{{ hotel.picture3.url }}" data-lightbox="gallery" data-title="Picture 3">
-                                                <img src="{{ hotel.picture3.url }}" alt="Picture 3" class="bd-placeholder-img card-img-top">
-                                            </a>
+                                        <div class="col">
+                                            <div class="card shadow-sm">
+                                                <a href="{{ hotel.picture3.url }}" data-lightbox="gallery" data-title="Picture 3">
+                                                    <img src="{{ hotel.picture3.url }}" alt="Picture 3" class="bd-placeholder-img card-img-top">
+                                                </a>
+                                            </div>
                                         </div>
-                                    </div>
                                     {% endif %}
                                     {% if hotel.picture4 %}
-                                    <div class="col">
-                                        <div class="card shadow-sm">
-                                            <a href="{{ hotel.picture4.url }}" data-lightbox="gallery" data-title="Picture 4">
-                                                <img src="{{ hotel.picture4.url }}" alt="Picture 4" class="bd-placeholder-img card-img-top">
-                                            </a>
+                                        <div class="col">
+                                            <div class="card shadow-sm">
+                                                <a href="{{ hotel.picture4.url }}" data-lightbox="gallery" data-title="Picture 4">
+                                                    <img src="{{ hotel.picture4.url }}" alt="Picture 4" class="bd-placeholder-img card-img-top">
+                                                </a>
+                                            </div>
                                         </div>
-                                    </div>
                                     {% endif %}
                                     {% if hotel.picture5 %}
-                                    <div class="col">
-                                        <div class="card shadow-sm">
-                                            <a href="{{ hotel.picture5.url }}" data-lightbox="gallery" data-title="Picture 5">
-                                                <img src="{{ hotel.picture5.url }}" alt="Picture 5" class="bd-placeholder-img card-img-top">
-                                            </a>
+                                        <div class="col">
+                                            <div class="card shadow-sm">
+                                                <a href="{{ hotel.picture5.url }}" data-lightbox="gallery" data-title="Picture 5">
+                                                    <img src="{{ hotel.picture5.url }}" alt="Picture 5" class="bd-placeholder-img card-img-top">
+                                                </a>
+                                            </div>
                                         </div>
-                                    </div>
                                     {% endif %}
                                     {% if hotel.picture6 %}
-                                    <div class="col">
-                                        <div class="card shadow-sm">
-                                            <a href="{{ hotel.picture6.url }}" data-lightbox="gallery" data-title="Picture 6">
-                                                <img src="{{ hotel.picture6.url }}" alt="Picture 6" class="bd-placeholder-img card-img-top">
-                                            </a>
+                                        <div class="col">
+                                            <div class="card shadow-sm">
+                                                <a href="{{ hotel.picture6.url }}" data-lightbox="gallery" data-title="Picture 6">
+                                                    <img src="{{ hotel.picture6.url }}" alt="Picture 6" class="bd-placeholder-img card-img-top">
+                                                </a>
+                                            </div>
                                         </div>
-                                    </div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -97,20 +146,80 @@
                     </div>
                 </div>
                 <hr>
-                <h3>Amenities:</h3>
                 <div class="card-body">
                     <div class="row">
-                        {% for amenity in amenities %}
-                            <div class="col-md-6">
-                                <ul class="list-unstyled">
-                                    {% for item in amenity %}
-                                        <li><i class="{{ item.icon }}"></i> {{ item.name }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        {% endfor %}
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                {% if hotel.has_pool %}
+                                    <li><i class="fas fa-swimming-pool"></i> Pool</li>
+                                {% endif %}
+                                {% if hotel.has_gym %}
+                                    <li><i class="fas fa-dumbbell"></i> Gym</li>
+                                {% endif %}
+                                {% if hotel.has_spa %}
+                                    <li><i class="fas fa-spa"></i> Spa</li>
+                                {% endif %}
+                                {% if hotel.has_restaurant %}
+                                    <li><i class="fas fa-utensils"></i> Restaurant</li>
+                                {% endif %}
+                                {% if hotel.has_wifi %}
+                                    <li><i class="fas fa-wifi"></i> WiFi</li>
+                                {% endif %}
+                                {% if hotel.has_parking %}
+                                    <li><i class="fas fa-parking"></i> Parking</li>
+                                {% endif %}
+                                {% if hotel.has_conference_facilities %}
+                                    <li><i class="fas fa-users"></i> Conference Facilities</li>
+                                {% endif %}
+                                {% if hotel.has_room_service %}
+                                    <li><i class="fas fa-concierge-bell"></i> Room Service</li>
+                                {% endif %}
+                                {% if hotel.has_bar %}
+                                    <li><i class="fas fa-glass-martini"></i> Bar</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                {% if hotel.has_fitness_center %}
+                                    <li><i class="fas fa-dumbbell"></i> Fitness Center</li>
+                                {% endif %}
+                                {% if hotel.has_business_center %}
+                                    <li><i class="fas fa-briefcase"></i> Business Center</li>
+                                {% endif %}
+                                {% if hotel.has_laundry_service %}
+                                    <li><i class="fas fa-tshirt"></i> Laundry Service</li>
+                                {% endif %}
+                                {% if hotel.has_childcare %}
+                                    <li><i class="fas fa-baby-carriage"></i> Childcare</li>
+                                {% endif %}
+                                {% if hotel.has_swimming_pool %}
+                                    <li><i class="fas fa-swimming-pool"></i> Swimming Pool</li>
+                                {% endif %}
+                                {% if hotel.has_hot_tub %}
+                                    <li><i class="fas fa-hot-tub"></i> Hot Tub</li>
+                                {% endif %}
+                                {% if hotel.has_sauna %}
+                                    <li><i class="fas fa-hot-tub"></i> Sauna</li>
+                                {% endif %}
+                                {% if hotel.has_24_hour_front_desk %}
+                                    <li><i class="fas fa-clock"></i> 24-hour Front Desk</li>
+                                {% endif %}
+                                {% if hotel.has_airport_shuttle %}
+                                    <li><i class="fas fa-shuttle-van"></i> Airport Shuttle</li>
+                                {% endif %}
+                                {% if hotel.has_car_rental %}
+                                    <li><i class="fas fa-car"></i> Car Rental</li>
+                                {% endif %}
+                                {% if hotel.has_currency_exchange %}
+                                    <li><i class="fas fa-dollar-sign"></i> Currency Exchange</li>
+                                {% endif %}
+                            </ul>
+                        </div>
                     </div>
                 </div>
+
+
                 <h3>Rooms:</h3>
                 <ul class="list-group">
                     {% for room in hotel.rooms.all %}
@@ -133,7 +242,9 @@
                         <li class="list-group-item">No rooms available for this hotel.</li>
                     {% endfor %}
                 </ul>
-                <a href="{% url 'room_add' hotel_id=hotel.id %}" class="btn btn-primary">Add Room</a>
+                {% if hotel.user == request.user %}
+                    <a href="{% url 'room_add' hotel_id=hotel.id %}" class="btn btn-primary">Add Room</a>
+                {% endif %}
             </div>
         </div>
     </div>
