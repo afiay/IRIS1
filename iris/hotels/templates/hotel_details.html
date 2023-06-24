@@ -37,6 +37,7 @@
                         <div class="album py-5 bg-light">
                             <div class="container">
                                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                                    {% if hotel.picture1 %}
                                     <div class="col">
                                         <div class="card shadow-sm">
                                             <a href="{{ hotel.picture1.url }}" data-lightbox="gallery" data-title="Picture 1">
@@ -44,6 +45,8 @@
                                             </a>
                                         </div>
                                     </div>
+                                    {% endif %}
+                                    {% if hotel.picture2 %}
                                     <div class="col">
                                         <div class="card shadow-sm">
                                             <a href="{{ hotel.picture2.url }}" data-lightbox="gallery" data-title="Picture 2">
@@ -51,34 +54,43 @@
                                             </a>
                                         </div>
                                     </div>
+                                    {% endif %}
+                                    {% if hotel.picture3 %}
                                     <div class="col">
                                         <div class="card shadow-sm">
-                                            <a href="{{ hotel.picture3.url }}" data-lightbox="gallery" data-title="Picture 2">
-                                                <img src="{{ hotel.picture3.url }}" alt="Picture 2" class="bd-placeholder-img card-img-top">
+                                            <a href="{{ hotel.picture3.url }}" data-lightbox="gallery" data-title="Picture 3">
+                                                <img src="{{ hotel.picture3.url }}" alt="Picture 3" class="bd-placeholder-img card-img-top">
                                             </a>
                                         </div>
                                     </div>
+                                    {% endif %}
+                                    {% if hotel.picture4 %}
                                     <div class="col">
                                         <div class="card shadow-sm">
-                                            <a href="{{ hotel.picture4.url }}" data-lightbox="gallery" data-title="Picture 1">
-                                                <img src="{{ hotel.picture4.url }}" alt="Picture 1" class="bd-placeholder-img card-img-top">
+                                            <a href="{{ hotel.picture4.url }}" data-lightbox="gallery" data-title="Picture 4">
+                                                <img src="{{ hotel.picture4.url }}" alt="Picture 4" class="bd-placeholder-img card-img-top">
                                             </a>
                                         </div>
                                     </div>
+                                    {% endif %}
+                                    {% if hotel.picture5 %}
                                     <div class="col">
                                         <div class="card shadow-sm">
-                                            <a href="{{ hotel.picture5.url }}" data-lightbox="gallery" data-title="Picture 2">
-                                                <img src="{{ hotel.picture5.url }}" alt="Picture 2" class="bd-placeholder-img card-img-top">
+                                            <a href="{{ hotel.picture5.url }}" data-lightbox="gallery" data-title="Picture 5">
+                                                <img src="{{ hotel.picture5.url }}" alt="Picture 5" class="bd-placeholder-img card-img-top">
                                             </a>
                                         </div>
                                     </div>
+                                    {% endif %}
+                                    {% if hotel.picture6 %}
                                     <div class="col">
                                         <div class="card shadow-sm">
-                                            <a href="{{ hotel.picture6.url }}" data-lightbox="gallery" data-title="Picture 2">
-                                                <img src="{{ hotel.picture6.url }}" alt="Picture 2" class="bd-placeholder-img card-img-top">
+                                            <a href="{{ hotel.picture6.url }}" data-lightbox="gallery" data-title="Picture 6">
+                                                <img src="{{ hotel.picture6.url }}" alt="Picture 6" class="bd-placeholder-img card-img-top">
                                             </a>
                                         </div>
                                     </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -106,7 +118,7 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <!-- Place the room picture as an image within the card -->
-                                    <img src="{{ room.picture.url }}" alt="Room Image" class="card-img">
+                                    <img src="{{ room.picture1.url }}" alt="Room Image" class="card-img">
                                 </div>
                                 <div class="col-md-8">
                                     <h5 class="card-title">Room {{ room.number }}</h5>
