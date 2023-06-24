@@ -1,5 +1,5 @@
-from django.conf import settings
 from django.db import models
+from django.conf import settings
 from authenticate.models import User
 
 class Hotel(models.Model):
@@ -59,6 +59,19 @@ class Room(models.Model):
 
     def __str__(self):
         return f"Room {self.number} - {self.hotel.name}"
+
+from django.db import models
+
+class RoomAvailability(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='availabilities')
+    date_from = models.DateField()
+    date_to = models.DateField()
+    is_available = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f"{self.room} - From: {self.date_from} To: {self.date_to} (Available: {self.is_available})"
+
+
 
 
 class Booking(models.Model):

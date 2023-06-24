@@ -1,26 +1,36 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Hotels</h2>
-  {% if hotels %}
-    <div class="hotel-card-container">
-      {% for hotel in hotels %}
-        <div class="hotel-card">
-          <div class="hotel-card-header">
-            <a href="{% url 'hotel_details' hotel.id %}">{{ hotel.name }}</a>
-          </div>
-          <div class="hotel-card-body">
-            <!-- Add additional hotel details here if needed -->
-          </div>
-          <div class="hotel-card-footer">
-            <a href="{% url 'edit_hotel' hotel.id %}">Edit</a>
-            <a href="{% url 'delete_hotel' hotel.id %}">Delete</a>
-          </div>
-        </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <p>No hotels found.</p>
-  {% endif %}
-  <a href="{% url 'add_hotel' %}" class="add-hotel-link">Add a Hotel</a>
+
+  <div class="container">
+      <h2>Available Hotels</h2>
+      <form class="form-inline mb-4" method="GET" action="{% url 'hotel_list' %}">
+          <label class="mr-2" for="date_from">Date From:</label>
+          <input type="date" id="date_from" name="date_from" class="form-control mr-3" required>
+          <label class="mr-2" for="date_to">Date To:</label>
+          <input type="date" id="date_to" name="date_to" class="form-control mr-3" required>
+          <label class="mr-2" for="guest_count">Guests:</label>
+          <input type="number" id="guest_count" name="guest_count" class="form-control mr-3" required>
+          <button type="submit" class="btn btn-primary">Search</button>
+      </form>
+      <div class="row">
+      {% if hotels %}
+          {% for hotel in hotels %}
+              <div class="col-md-6 mb-4">
+                  <div class="card">
+                      <img src="{{ hotel.picture1.url }}" class="card-img-top" alt="Hotel Picture">
+                      <div class="card-body">
+                          <h5 class="card-title">{{ hotel.name }}</h5>
+                          <p class="card-text">{{ hotel.address }}</p>
+                          <!-- Add more hotel details as needed -->
+                          <a href="{% url 'hotel_details' hotel.id %}" class="btn btn-primary">View Details</a>
+                      </div>
+                  </div>
+              </div>
+          {% endfor %}
+      {% else %}
+          <p>No hotels available for the selected criteria.</p>
+      {% endif %}
+  </div>
+</div>
 {% endblock %}

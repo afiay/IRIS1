@@ -3,11 +3,19 @@ from .models import Hotel, Room, Booking
 from .forms import BookingForm, RoomForm, HotelForm
 
 
-def room_list(request, hotel_id):
-    hotel = get_object_or_404(Hotel, pk=hotel_id)
-    rooms = hotel.rooms.all()
-    return render(request, 'room_list.html', {'hotel': hotel, 'rooms': rooms})
 
+def room_list(request, hotel_id=None):
+    if hotel_id:
+        hotel = get_object_or_404(Hotel, pk=hotel_id)
+        rooms = hotel.rooms.all()
+    else:
+        rooms = Room.objects.all()
+    
+    return render(request, 'room_list.html', {'rooms': rooms})
+
+from django.shortcuts import render, redirect, get_object_or_404
+from .forms import BookingForm
+from .models import Room
 
 def booking(request, room_id):
     room = get_object_or_404(Room, pk=room_id)
@@ -26,14 +34,43 @@ def booking(request, room_id):
     return render(request, 'booking.html', {'room': room, 'booking_form': booking_form})
 
 
+
 def booking_success(request, booking_id):
     booking = get_object_or_404(Booking, pk=booking_id)
     return render(request, 'booking_success.html', {'booking': booking})
 
 
+from django.db.models import Q
+
 def hotel_list(request):
-    hotels = Hotel.objects.all()
-    return render(request, 'hotel_list.html', {'hotels': hotels})
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    guest_count = request.GET.get('guest_count')
+
+    # Check if the filter parameters are provided
+    if date_from and date_to and guest_count:
+        guest_count = int(guest_count)
+
+        # Filter hotels based on available rooms and capacity
+        hotels = Hotel.objects.filter(
+            rooms__capacity__gte=guest_count,
+            rooms__availabilities__date_from__lte=date_from,
+            rooms__availabilities__date_to__gte=date_to,
+            rooms__availabilities__is_available=True
+        ).distinct()
+    else:
+        # If the filter parameters are not provided, return all hotels
+        hotels = Hotel.objects.all()
+
+    context = {
+        'hotels': hotels,
+        'date_from': date_from,
+        'date_to': date_to,
+        'guest_count': guest_count
+    }
+
+    return render(request, 'hotel_list.html', context)
+
 
 
 def add_hotel(request):
@@ -103,9 +140,27 @@ def hotel_details(request, hotel_id):
 
 
 
+
 def room_details(request, room_id):
     room = get_object_or_404(Room, pk=room_id)
-    return render(request, 'room_details.html', {'room': room})
+    form = BookingForm()
+
+    if request.method == 'POST':
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            check_in = form.cleaned_data['check_in']
+            check_out = form.cleaned_data['check_out']
+            # Create a new booking instance
+            booking = Booking(user=request.user, room=room, check_in=check_in, check_out=check_out)
+            booking.save()
+            return redirect('booking_confirmation')  # Redirect to a booking confirmation page
+
+    context = {
+        'room': room,
+        'form': form,
+    }
+
+    return render(request, 'room_details.html', context)
 
 
 def room_list(request, hotel_id=None):
@@ -147,3 +202,23 @@ def room_edit(request, room_id):
         form = RoomForm(instance=room)
 
     return render(request, 'room_edit.html', {'form': form, 'room': room, 'hotel': hotel})
+
+
+def room_availability(request, room_id):
+    room = get_object_or_404(Room, id=room_id)
+    availabilities = room.availabilities.all()
+
+    # Filter availabilities based on date range if provided in the request
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    if date_from and date_to:
+        availabilities = availabilities.filter(date__range=[date_from, date_to])
+
+    context = {
+        'room': room,
+        'availabilities': availabilities,
+        'date_from': date_from,
+        'date_to': date_to
+    }
+
+    return render(request, 'availability.html', context)
