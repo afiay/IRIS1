@@ -141,7 +141,7 @@ def add_rating_hotel(request, hotel_id):
     else:
         rating_form = RatingForm()
 
-    return render(request, 'add_rating.html', {'hotel': hotel, 'rating_form': rating_form})
+    return redirect('hotel_details', hotel_id=hotel_id)
 
 
 

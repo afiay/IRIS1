@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Post Detail{% endblock %}
+
+{% block content %}
+<h2>{{ post.title }}</h2>
+<p>{{ post.content }}</p>
+{% if post.image %}
+<img src="{{ post.image.url }}" alt="Post Image">
+{% endif %}
+<br>
+{% if request.user.is_authenticated %}
+<form method="post" action="{% url 'add_comment' post_id=post.id %}">
+  {% csrf_token %}
+  {{ comment_form.as_p }}
+  <button type="submit">Add Comment</button>
+</form>
+{% else %}
+<p><a href="{% url 'login' %}">Login</a> to add a comment</p>
+{% endif %}
+<br>
+<h3>Comments:</h3>
+{% for comment in comments %}
+<p>{{ comment.content }}</p>
+<p>By: {{ comment.user.username }}</p>
+<hr>
+{% endfor %}
+{% endblock %}

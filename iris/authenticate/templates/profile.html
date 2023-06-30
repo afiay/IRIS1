@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h1>Profile</h1>
+        <hr>
+        <div class="row">
+            <div class="col-md-4">
+                <img src="{{ user.profile_picture.url }}" alt="Profile Picture" class="img-fluid">
+                <h5 class="mt-3">{{ user.username }}</h5>
+                <p>{{ user.bio }}</p>
+                <p>Email: {{ user.email }}</p>
+                <p>Website: <a href="{{ user.url }}">{{ user.url }}</a></p>
+            </div>
+            <div class="col-md-8">
+                <h3>Cover Picture</h3>
+                <img src="{{ user.cover_picture.url }}" alt="Cover Picture" class="img-fluid">
+            </div>
+        </div>
+        <div class="mt-4 text-right">
+            <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#editProfileModal">Edit Profile</a>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form method="post" enctype="multipart/form-data" id="editProfileForm">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extrascripts %}
+    <script>
+        // Submit the form via AJAX
+        $('#editProfileForm').submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'POST',
+                url: '{% url 'edit_profile' %}',
+                data: new FormData(this),
+                processData: false,
+                contentType: false,
+                success: function () {
+                    // Handle success response
+                    // For example, display a success message or refresh the page
+                    location.reload();
+                },
+                error: function () {
+                    // Handle error response
+                    // For example, display an error message
+                }
+            });
+        });
+    </script>
+{% endblock %}

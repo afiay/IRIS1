@@ -149,3 +149,53 @@ footer {
 .container .btn-primary {
     margin-top: 10px;
 }
+
+/* Navigation styles */
+.navbar {
+    background-color: #333;
+}
+
+.navbar-brand {
+    color: #fff;
+    font-size: 18px;
+}
+
+.navbar-toggler {
+    border: none;
+    color: #fff;
+}
+
+.navbar-toggler-icon {
+    color: #fff;
+}
+
+.navbar-nav .nav-link {
+    color: #fff;
+    font-size: 14px;
+    border-radius: 20px;
+    transition: background-color 0.2s;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    background-color: #555;
+}
+
+.dropdown-menu {
+    background-color: #333;
+}
+
+.dropdown-item {
+    color: #fff;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus,
+.dropdown-item:active {
+    background-color: #555;
+    outline: none;
+}
+
+.dropdown-item:last-child {
+    margin-bottom: 0;
+}

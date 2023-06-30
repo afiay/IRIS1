@@ -32,10 +32,9 @@ class RatingForm(forms.ModelForm):
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
-        fields = ['service', 'user', 'from_date', 'to_date', 'participants']
+        fields = ['service', 'from_date', 'to_date', 'participants']
         widgets = {
             'service': forms.HiddenInput(),
-            'user': forms.HiddenInput(),
             'from_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'to_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
             'participants': forms.NumberInput(attrs={'class': 'form-control'}),

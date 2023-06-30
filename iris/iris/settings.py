@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'base',
     'hotels',
     'authenticate',
+    'blog',
 ]
 
 AUTH_USER_MODEL = 'authenticate.User'

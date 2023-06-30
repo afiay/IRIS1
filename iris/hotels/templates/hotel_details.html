@@ -17,6 +17,7 @@
         <h2 class="card-title">{{ hotel.name }}</h2>
         <p class="card-text">{{ hotel.description }}</p>
     </div>
+    
     <hr>
     <div class="row">
         <div class="col-md-4">
@@ -24,11 +25,27 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ hotel.name }}</h5>
                     <p class="card-text"><strong>Address:</strong> {{ hotel.address }}</p>
-                    <!-- Include other hotel details here -->
-                    {% if hotel.user == request.user %}
-                        <a href="{% url 'edit_hotel' hotel.id %}" class="btn btn-secondary">Edit</a>
-                        <a href="{% url 'delete_hotel' hotel.id %}" class="btn btn-danger">Delete</a>
-                    {% endif %}
+                        <ul class="list-unstyled">
+                            {% if hotel.check_in_time %}
+                                <li><i class="check-in-icon fas fa-clock"></i> Check-in Time: {{ hotel.check_in_time }}</li>
+                            {% endif %}
+                            {% if hotel.check_out_time %}
+                                <li><i class="check-out-icon fas fa-clock"></i> Check-out Time: {{ hotel.check_out_time }}</li>
+                            {% endif %}
+                            {% if hotel.country %}
+                                <li><i class="country-icon fas fa-globe"></i> Country: {{ hotel.country }}</li>
+                            {% endif %}
+                            {% if hotel.phone_number %}
+                                <li><i class="phone-icon fas fa-phone"></i> Phone: {{ hotel.phone_number }}</li>
+                            {% endif %}
+                            {% if hotel.email_address %}
+                                <li><i class="email-icon fas fa-envelope"></i> Email: {{ hotel.email_address }}</li>
+                            {% endif %}
+                        </ul>
+                        {% if hotel.user.id == request.user.id %}
+                            <a href="{% url 'edit_hotel' hotel.id %}" class="btn btn-secondary">Edit</a>
+                            <a href="{% url 'delete_hotel' hotel.id %}" class="btn btn-danger">Delete</a>
+                        {% endif %}
                     <ul class="list-group">
                         {% for rating in ratings %}
                             <li class="list-group-item">

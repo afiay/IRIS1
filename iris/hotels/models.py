@@ -3,9 +3,17 @@ from django.conf import settings
 from authenticate.models import User
 
 class Hotel(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=255)
     description = models.TextField(max_length=255)
+    check_in_time = models.TimeField()
+    check_out_time = models.TimeField()
+    country = models.CharField(max_length=100)
+    longitude = models.FloatField()
+    latitude = models.FloatField()
+    phone_number = models.CharField(max_length=20)
+    email_address = models.EmailField()
     cover_picture = models.ImageField(upload_to='media/hotel/hotel_covers/')
     hotel_logo = models.ImageField(upload_to='media/hotel/hotel_logos/')
     picture1 = models.ImageField(upload_to='media/hotel/hotel_pictures/', blank=True)
@@ -43,6 +51,7 @@ class Hotel(models.Model):
 
 
 class Room(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='rooms')
     number = models.CharField(max_length=10)
     capacity = models.PositiveIntegerField()
@@ -92,5 +101,6 @@ class HotelRating(models.Model):
     rating = models.IntegerField(choices=((1, '1 Star'), (2, '2 Stars'), (3, '3 Stars'), (4, '4 Stars'), (5, '5 Stars')))
     comment = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
+    service = models.CharField(max_length=100, null=True, blank=True)
     def __str__(self):
-        return f"{self.service.name}: {self.rating}"
+        return f"{self.service}: {self.rating}"
