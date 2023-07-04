@@ -1,0 +1,12 @@
+<form method="post">
+  {% csrf_token %}
+  {{ booking_form.as_p }}
+  {% if availability %}
+    <input type="hidden" name="availability_id" value="{{ availability.id }}">
+    <p>Available from: {{ availability.start_date }}</p>
+    <p>Available until: {{ availability.end_date }}</p>
+    <input type="submit" value="Book Now">
+  {% else %}
+    <p>No availability for the selected room.</p>
+  {% endif %}
+</form>

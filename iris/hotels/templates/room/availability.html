@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Room Availability{% endblock %}
+
+{% block content %}
+  <h1>Room Availability</h1>
+
+  <h2>{{ room.number }}</h2>
+
+  {% if availability_dates %}
+    <p>Available Dates:</p>
+    <ul>
+      {% for date in availability_dates %}
+        <li>{{ date }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No availability dates found for this room.</p>
+  {% endif %}
+  
+  <a href="{% url 'room_list' %}">Back to Room List</a>
+{% endblock %}

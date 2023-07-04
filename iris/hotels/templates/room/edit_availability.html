@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Availability{% endblock %}
+
+{% block content %}
+  <h1>Edit Availability</h1>
+
+  <form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+  </form>
+
+  <a href="{% url 'delete_availability' room_id=room.id availability_id=availability.id %}">Delete Availability</a>
+</div>
+{% endblock %}

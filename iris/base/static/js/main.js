@@ -1,47 +1,76 @@
-    $(document).ready(function() {
-        $('.star-rating .star').on('click', function() {
-            var ratingValue = $(this).data('value');
-            var $ratingInput = $(this).closest('.star-rating').find('input[name="rating"]');
-            $ratingInput.val(ratingValue);
-            updateStarRating($(this).closest('.star-rating'), ratingValue);
-        });
+$(document).ready(function() {
+  // Star rating functionality
+  $('.star-rating .star').on('click', function() {
+    var ratingValue = $(this).data('value');
+    var $ratingInput = $(this).closest('.star-rating').find('input[name="rating"]');
+    $ratingInput.val(ratingValue);
+    updateStarRating($(this).closest('.star-rating'), ratingValue);
+  });
 
-        function updateStarRating($ratingContainer, ratingValue) {
-            $ratingContainer.find('.star').each(function() {
-                var currentValue = $(this).data('value');
-                if (currentValue <= ratingValue) {
-                    $(this).addClass('fas');
-                    $(this).removeClass('far');
-                } else {
-                    $(this).addClass('far');
-                    $(this).removeClass('fas');
-                }
-            });
-        }
+  function updateStarRating($ratingContainer, ratingValue) {
+    $ratingContainer.find('.star').each(function() {
+      var currentValue = $(this).data('value');
+      if (currentValue <= ratingValue) {
+        $(this).addClass('fas');
+        $(this).removeClass('far');
+      } else {
+        $(this).addClass('far');
+        $(this).removeClass('fas');
+      }
     });
-// Get the SVG element
-const svgElement = document.querySelector('svg');
+  }
 
-// Define the animation function
-function animate() {
-  // Reset the animation by removing the 'animated' class
-  svgElement.classList.remove('animated');
+  // SVG animation
+  const svgElement = document.querySelector('svg');
 
-  // Trigger reflow to restart the animation
-  void svgElement.offsetWidth;
+  function animate() {
+    svgElement.classList.remove('animated');
+    void svgElement.offsetWidth;
+    svgElement.classList.add('animated');
+  }
 
-  // Add the 'animated' class to start the animation
-  svgElement.classList.add('animated');
-}
+  window.addEventListener('load', animate);
 
-// Trigger the animation when the page loads
-window.addEventListener('load', animate);
+  svgElement.addEventListener('animationend', () => {
+    svgElement.classList.remove('animated');
+  });
 
-// Listen for animation end event
-svgElement.addEventListener('animationend', () => {
-  // Remove the 'animated' class to reset the animation
-  svgElement.classList.remove('animated');
+  // Carousel initialization
+  $('#hotelPicturesCarousel').carousel();
+
+  // Room form submission
+  $('#roomForm').submit(function(event) {
+    event.preventDefault();
+
+    var roomNumber = $('#roomNumberInput').val();
+    var roomCapacity = $('#roomCapacityInput').val();
+    var roomPrice = $('#roomPriceInput').val();
+
+    var formData = {
+      room_number: roomNumber,
+      room_capacity: roomCapacity,
+      room_price: roomPrice
+    };
+
+    $.ajax({
+      url: $(this).attr('action'),
+      type: 'POST',
+      data: formData,
+      dataType: 'json',
+      success: function(response) {
+        console.log('Room details updated successfully');
+        $('#roomModal').modal('hide');
+      },
+      error: function(xhr, status, error) {
+        console.log('Error updating room details:', error);
+      }
+    });
+  });
+
+  // AJAX request for updating room availability
+  $.ajax({
+    url: '{% url "availability_edit" room.id %}',
+    // Rest of the AJAX configuration
+    // ...
+  });
 });
-    $(document).ready(function () {
-        $('#hotelPicturesCarousel').carousel();
-    });

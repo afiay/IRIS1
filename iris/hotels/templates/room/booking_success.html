@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking Success{% endblock %}
+
+{% block content %}
+  <h1>Booking Success</h1>
+
+  <div class="booking-details">
+    <h2>Booking Details</h2>
+    <p>Room: {{ booking.room.number }}</p>
+    <p>Check-in Date: {{ booking.check_in_date }}</p>
+    <p>Check-out Date: {{ booking.check_out_date }}</p>
+    <p>Guests: {{ booking.guests }}</p>
+    <p>Total Amount: ${{ booking.total_amount }}</p>
+    <!-- Add more booking details as needed -->
+  </div>
+
+  <!-- Add any additional content you want to display on the success page -->
+{% endblock %}

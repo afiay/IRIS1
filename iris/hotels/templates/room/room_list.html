@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Room List{% endblock %}
+
+{% block content %}
+  <h1>Room List</h1>
+
+  {% if rooms %}
+    <ul>
+      {% for room in rooms %}
+        <li>
+          <h2>{{ room.number }}</h2>
+          <p>Capacity: {{ room.capacity }}</p>
+          <p>Price per night: {{ room.price_per_night }}</p>
+          <!-- Add more room details as needed -->
+          <a href="{% url 'booking' room_id=room.id %}">Book Now</a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No rooms available.</p>
+  {% endif %}
+{% endblock %}

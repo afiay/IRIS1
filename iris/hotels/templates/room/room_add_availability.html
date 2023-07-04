@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Room Availability{% endblock %}
+
+{% block content %}
+  <h1>Add Room Availability</h1>
+
+  <form method="POST">
+    {% csrf_token %}
+
+    <!-- Room Availability Form Fields -->
+    {{ availability_form.as_p }}
+
+    <button type="submit">Add Availability</button>
+  </form>
+{% endblock %}

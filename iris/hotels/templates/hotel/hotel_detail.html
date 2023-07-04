@@ -236,29 +236,42 @@
                     </div>
                 </div>
 
-
-                <h3>Rooms:</h3>
-                <ul class="list-group">
-                    {% for room in hotel.rooms.all %}
-                        <li class="list-group-item">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <!-- Place the room picture as an image within the card -->
-                                    <img src="{{ room.picture1.url }}" alt="Room Image" class="card-img">
-                                </div>
-                                <div class="col-md-8">
-                                    <h5 class="card-title">Room {{ room.number }}</h5>
-                                    <p class="card-text">Capacity: {{ room.capacity }}</p>
-                                    <p class="card-text">Price per Night: {{ room.price_per_night }}</p>
-                                    <a href="{% url 'room_details' room.id %}" class="btn btn-primary">View Details</a>
-                                    <!-- Add Edit and Delete buttons for the room if required -->
-                                </div>
+            <h3>Rooms:</h3>
+            <ul class="list-group">
+                {% for room in hotel.rooms.all %}
+                    <li class="list-group-item">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <!-- Place the room picture as an image within the card -->
+                                <img src="{{ room.picture1.url }}" alt="Room Image" class="card-img">
                             </div>
-                        </li>
-                    {% empty %}
-                        <li class="list-group-item">No rooms available for this hotel.</li>
-                    {% endfor %}
-                </ul>
+                            <div class="col-md-8">
+                                <h5 class="card-title">Room {{ room.number }}</h5>
+                                <p class="card-text">Capacity: {{ room.capacity }}</p>
+                                <p class="card-text">Price per Night: {{ room.price_per_night }}</p>
+                                <p class="card-text">Availability:
+                                    {% if room.availabilities.exists %}
+                                        {% for availability in room.availabilities.all %}
+                                            {% if availability.is_available %}
+                                                Available from {{ availability.start_date }} to {{ availability.end_date }}
+                                            {% else %}
+                                                Not Available from {{ availability.start_date }} to {{ availability.end_date }}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% else %}
+                                        No availability information
+                                    {% endif %}
+                                </p>
+                                <a href="{% url 'room_details' room.id %}" class="btn btn-primary">View Details</a>
+                                <!-- Add Edit and Delete buttons for the room if required -->
+                            </div>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">No rooms available for this hotel.</li>
+                {% endfor %}
+            </ul>
+
                 {% if hotel.user == request.user %}
                     <a href="{% url 'room_add' hotel_id=hotel.id %}" class="btn btn-primary">Add Room</a>
                 {% endif %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Room Availability{% endblock %}
+
+{% block content %}
+  <h1>Room Availability</h1>
+
+  <div class="room-details">
+    <h2>{{ room.number }}</h2>
+    <p>Capacity: {{ room.capacity }}</p>
+    <p>Price per night: {{ room.price_per_night }}</p>
+    <!-- Add more room details as needed -->
+  </div>
+
+  <div class="availability-dates">
+    <h3>Availability Dates</h3>
+    {% if availability_dates %}
+      <ul>
+        {% for date in availability_dates %}
+          <li>{{ date }}</li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No availability dates.</p>
+    {% endif %}
+  </div>
+{% endblock %}

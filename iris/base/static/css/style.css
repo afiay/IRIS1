@@ -199,3 +199,12 @@ footer {
 .dropdown-item:last-child {
     margin-bottom: 0;
 }
+.available {
+  color: green;
+  font-weight: bold;
+}
+
+.unavailable {
+  color: red;
+  font-weight: normal;
+}

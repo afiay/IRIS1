@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+
+{% block title %}Room Details{% endblock %}
+
+{% block content %}
+{% load custom_filters %}
+
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8">
+        <h1>Room Details</h1>
+
+        <div class="room-details">
+          <h2>{{ room.number }}</h2>
+          <p>Capacity: {{ room.capacity }}</p>
+          <p>Price per night: {{ room.price_per_night }}</p>
+          <!-- Add more room details as needed -->
+        </div>
+
+        <div class="availability">
+          <h3>Availability</h3>
+          {% if availability %}
+            <p>Start Date: {{ availability.start_date }}</p>
+            <p>End Date: {{ availability.end_date }}</p>
+            <p>Is Available: {{ availability.is_available }}</p>
+            <a href="{% url 'edit_availability' room_id=room.id availability_id=availability.id %}">Edit Availability</a>
+          {% else %}
+            <p>No availability information.</p>
+            <a href="{% url 'room_add_availability' room_id=room.id %}">Add Availability</a>
+          {% endif %}
+        </div>
+
+        <div class="availability-list">
+          <h3>Availability List</h3>
+          {% if availabilities %}
+            <ul>
+              {% for availability in availabilities %}
+                <li>
+                  Start Date: {{ availability.start_date }} - End Date: {{ availability.end_date }}
+                  <a href="{% url 'edit_availability' room_id=room.id availability_id=availability.id %}">Edit</a>
+                  <a href="{% url 'delete_availability' room_id=room.id availability_id=availability.id %}">Delete</a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>No availability entries.</p>
+          {% endif %}
+        </div>
+
+        <div class="availability-calendar">
+          <h3>Availability Calendar</h3>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+                <th>Sun</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for week in availability_calendar %}
+                <tr>
+                  {% for day in week %}
+                    {% if day %}
+                      {% if day in availability_dates %}
+                        {% for availability in availabilities %}
+                          {% if day in availability.get_available_dates %}
+                            {% if availability.is_available %}
+                          <td>
+                            {% if class_name == 'available-day' %}
+                              <div class="available" style="color: green; font-weight: bold;">{{ day }}</div>
+                            {% elif class_name == 'unavailable-day' %}
+                              <div class="unavailable" style="color: red; font-weight: normal;">{{ day }}</div>
+                            {% endif %}
+                          </td>
+                            {% endif %}
+                          {% endif %}
+                        {% endfor %}
+                      {% else %}
+                        <td>{{ day }}</td>
+                      {% endif %}
+                    {% else %}
+                      <td></td>
+                    {% endif %}
+                  {% endfor %}
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <a href="{% url 'booking' room_id=room.id %}" class="btn btn-primary">Book Now</a>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="room-pictures">
+          <h3>Room Pictures</h3>
+          {% if room.picture1 %}
+            <div class="picture-box">
+              <div class="white-box"></div>
+              <img src="{{ room.picture1.url }}" alt="Room Picture" class="img-fluid">
+            </div>
+          {% endif %}
+          {% if room.picture2 %}
+            <div class="picture-box">
+              <div class="white-box"></div>
+              <img src="{{ room.picture2.url }}" alt="Room Picture" class="img-fluid">
+            </div>
+          {% endif %}
+          {% if room.picture3 %}
+            <div class="picture-box">
+              <div class="white-box"></div>
+              <img src="{{ room.picture3.url }}" alt="Room Picture" class="img-fluid">
+            </div>
+          {% endif %}
+          {% if room.picture4 %}
+            <div class="picture-box">
+              <div class="white-box"></div>
+              <img src="{{ room.picture4.url }}" alt="Room Picture" class="img-fluid">
+            </div>
+          {% endif %}
+          {% if room.picture5 %}
+            <div class="picture-box">
+              <div class="white-box"></div>
+              <img src="{{ room.picture5.url }}" alt="Room Picture" class="img-fluid">
+            </div>
+          {% endif %}
+          {% if room.picture6 %}
+            <div class="picture-box">
+              <div class="white-box"></div>
+              <img src="{{ room.picture6.url }}" alt="Room Picture" class="img-fluid">
+            </div>
+          {% endif %}
+          {% if room.picture7 %}
+            <div class="picture-box">
+              <div class="white-box"></div>
+              <img src="{{ room.picture7.url }}" alt="Room Picture" class="img-fluid">
+            </div>
+          {% endif %}
+          {% if room.picture8 %}
+            <div class="picture-box">
+              <div class="white-box"></div>
+              <img src="{{ room.picture8.url }}" alt="Room Picture" class="img-fluid">
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Find all elements with the "day" class
+  const days = document.querySelectorAll('.day');
+
+  // Loop through each day element
+  days.forEach((day) => {
+    const dayText = day.textContent;
+
+    // Check if the day is in the availability dates
+    if (availability_dates.includes(dayText)) {
+      // Loop through each availability
+      availabilities.forEach((availability) => {
+        // Check if the day is in the availability's available dates
+        if (availability.get_available_dates.includes(dayText)) {
+          // Apply appropriate class based on availability
+          if (availability.is_available) {
+            day.classList.add('available');
+          } else {
+            day.classList.add('unavailable');
+          }
+        }
+      });
+    }
+  });
+</script>
+
+<style>
+  #day1 {
+    color: green;
+    font-weight: bold;
+  }
+
+  .unavailable {
+    color: red;
+    font-weight: normal;
+  }
+
+  .room-pictures {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .picture-box {
+    position: relative;
+    max-width: 300px;
+  }
+
+  .white-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+{% endblock %}
