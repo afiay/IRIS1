@@ -23,6 +23,8 @@ def room_list(request, hotel_id=None):
         rooms = Room.objects.all()
     return render(request, 'room/room_list.html', {'rooms': rooms})
 
+import folium
+from folium.plugins import MarkerCluster
 
 @login_required
 def hotel_list(request):
@@ -114,6 +116,17 @@ def hotel_list(request):
     paginator = Paginator(hotels, 5)  # Set the desired number of hotels per page
     page_number = request.GET.get('page')
     hotels = paginator.get_page(page_number)
+    # Create a hotel map and add markers for hotel locations
+    hotel_map = folium.Map(location=[0, 0], zoom_start=2)
+    marker_cluster = MarkerCluster().add_to(hotel_map)
+
+    for hotel in hotels:
+        latitude = hotel.latitude
+        longitude = hotel.longitude
+        folium.Marker([latitude, longitude]).add_to(marker_cluster)
+
+    # Generate the HTML representation of the hotel map
+    hotel_map_html = hotel_map._repr_html_()
 
     context = {
         'hotels': hotels,
@@ -128,6 +141,7 @@ def hotel_list(request):
         'price_range': price_range,
         'boolean_fields': boolean_fields,
         'field_values': request.GET,
+        'hotel_map': hotel_map_html, # Add the hotel map to the template context
     }
 
     return render(request, 'hotel/hotel_list.html', context)

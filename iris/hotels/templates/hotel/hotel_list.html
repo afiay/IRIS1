@@ -2,7 +2,6 @@
 {% load custom_filters %}
 
 {% block content %}
-
 <div class="container">
     <div class="row">
         <div class="col-md-3">
@@ -68,6 +67,9 @@
 
         <div class="col-md-9">
             <hr>
+            <div class="map-container">
+                <div id="map" class="map">{{ hotel_map|safe }}</div>
+            </div>
             {% if hotels %}
                 {% with price_range.0|floatformat:2 as min_price %}
                     {% with price_range.1|floatformat:2 as max_price %}
@@ -104,6 +106,46 @@
     .filter-group {
         margin-bottom: 20px;
     }
+
+    .map-container {
+        position: relative;
+        width: 100%;
+        padding-bottom: 56.25%; /* 16:9 aspect ratio, adjust as needed */
+        height: 0;
+    }
+
+    .map {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    @media (max-width: 768px) {
+        /* Adjust map container size for smaller screens */
+        .map-container {
+            padding-bottom: 75%; /* 4:3 aspect ratio, adjust as needed */
+        }
+    }
 </style>
+
+<script>
+    mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [0, 0],
+        zoom: 2
+    });
+
+    map.addControl(new mapboxgl.NavigationControl());
+
+    {% for hotel in hotels %}
+        var marker = new mapboxgl.Marker()
+            .setLngLat([{{ hotel.longitude }}, {{ hotel.latitude }}])
+            .addTo(map);
+    {% endfor %}
+</script>
 
 {% endblock %}
