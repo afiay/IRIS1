@@ -22,6 +22,8 @@ from decimal import Decimal
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.db.models import DecimalField
+from django.core.paginator import Paginator
+
 @login_required
 def hotel_list(request):
     date_from = request.GET.get('date_from')
@@ -103,6 +105,11 @@ def hotel_list(request):
         hotels.aggregate(min_price=models.Min('rooms__price_per_night'))['min_price'] or 0,
         hotels.aggregate(max_price=models.Max('rooms__price_per_night'))['max_price'] or 0
     )
+    
+    # Paginate the hotels queryset
+    paginator = Paginator(hotels, 5)  # Set the desired number of hotels per page
+    page_number = request.GET.get('page')
+    hotels = paginator.get_page(page_number)
 
     context = {
         'hotels': hotels,

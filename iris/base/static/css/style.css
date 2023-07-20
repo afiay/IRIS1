@@ -208,3 +208,27 @@ footer {
   color: red;
   font-weight: normal;
 }
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.page-link {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: #f5f5f5;
+    color: #333;
+    text-decoration: none;
+    border-radius: 4px;
+    margin: 0 4px;
+}
+
+.current-page {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: #428bca;
+    color: #fff;
+    border-radius: 4px;
+    margin: 0 4px;
+}
