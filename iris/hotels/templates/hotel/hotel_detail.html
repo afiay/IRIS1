@@ -242,8 +242,11 @@
                     <li class="list-group-item">
                         <div class="row">
                             <div class="col-md-4">
-                                <!-- Place the room picture as an image within the card -->
-                                <img src="{{ room.picture1.url }}" alt="Room Image" class="card-img">
+                                {% if room.picture1 %}
+                                    <img src="{{ room.picture1.url }}" alt="Room Image" class="card-img">
+                                {% else %}
+                                    <span>No image available</span>
+                                {% endif %}
                             </div>
                             <div class="col-md-8">
                                 <h5 class="card-title">Room {{ room.number }}</h5>

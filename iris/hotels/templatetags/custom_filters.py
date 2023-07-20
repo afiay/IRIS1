@@ -13,3 +13,7 @@ def get_value_from_dict(dictionary, key):
 @register.filter
 def split_weekheader(weekheader):
     return weekheader.split()
+
+@register.filter
+def get_value(dictionary, key):
+    return dictionary.get(key)

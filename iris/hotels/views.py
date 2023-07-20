@@ -16,32 +16,113 @@ def room_list(request, hotel_id=None):
     else:
         rooms = Room.objects.all()
     return render(request, 'room/room_list.html', {'rooms': rooms})
+from django.db import models
+from django.db.models import Q
+from decimal import Decimal
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.db.models import DecimalField
 @login_required
 def hotel_list(request):
     date_from = request.GET.get('date_from')
     date_to = request.GET.get('date_to')
     guest_count = request.GET.get('guest_count')
-    # Check if the filter parameters are provided
+    rate_filter = request.GET.get('rate')
+    price_filter = request.GET.get('price')
+    country_filter = request.GET.get('country')
+    availability_filter = request.GET.get('availability')
+
+    boolean_fields = [
+        'has_pool',
+        'has_gym',
+        'has_spa',
+        'has_restaurant',
+        'has_wifi',
+        'has_parking',
+        'has_conference_facilities',
+        'has_room_service',
+        'has_bar',
+        'has_fitness_center',
+        'has_business_center',
+        'has_laundry_service',
+        'has_childcare',
+        'has_swimming_pool',
+        'has_hot_tub',
+        'has_sauna',
+        'has_24_hour_front_desk',
+        'has_airport_shuttle',
+        'has_car_rental',
+        'has_currency_exchange',
+    ]
+
+    hotels = Hotel.objects.all()
+
     if date_from and date_to and guest_count:
         guest_count = int(guest_count)
 
-        # Filter hotels based on available rooms and capacity
-        hotels = Hotel.objects.filter(
+        hotels = hotels.filter(
             rooms__capacity__gte=guest_count,
             rooms__availabilities__start_date__lte=date_from,
             rooms__availabilities__end_date__gte=date_to,
             rooms__availabilities__is_available=True
         ).distinct()
-    else:
-        # If the filter parameters are not provided, return all hotels
-        hotels = Hotel.objects.all()
+
+    if rate_filter:
+        hotels = hotels.filter(ratings__isnull=False)
+
+    if price_filter:
+        hotels = hotels.filter(rooms__price_per_night__gt=Decimal('0.00'))
+
+    if country_filter:
+        hotels = hotels.filter(country=country_filter)
+
+    if availability_filter:
+        hotels = hotels.filter(
+            rooms__availabilities__start_date__lte=availability_filter,
+            rooms__availabilities__end_date__gte=availability_filter,
+            rooms__availabilities__is_available=True
+        ).distinct()
+
+    # Filter hotels based on selected amenities
+    selected_amenities = [field.lower() for field in boolean_fields if request.GET.get(field)]
+    if selected_amenities:
+        filters = Q()
+        for amenity in selected_amenities:
+            filters |= Q(**{amenity: True})
+        hotels = hotels.filter(filters)
+
+    rates = [
+        (1, range(1)),
+        (2, range(2)),
+        (3, range(3)),
+        (4, range(4)),
+        (5, range(5)),
+    ]
+
+    price_range = (
+        hotels.aggregate(min_price=models.Min('rooms__price_per_night'))['min_price'] or 0,
+        hotels.aggregate(max_price=models.Max('rooms__price_per_night'))['max_price'] or 0
+    )
+
     context = {
         'hotels': hotels,
         'date_from': date_from,
         'date_to': date_to,
-        'guest_count': guest_count
+        'guest_count': guest_count,
+        'rate_filter': rate_filter,
+        'price_filter': price_filter,
+        'country_filter': country_filter,
+        'availability_filter': availability_filter,
+        'rates': rates,
+        'price_range': price_range,
+        'boolean_fields': boolean_fields,
+        'field_values': request.GET,
     }
+
     return render(request, 'hotel/hotel_list.html', context)
+
+
+
 @login_required
 def add_hotel(request):
     if request.method == 'POST':

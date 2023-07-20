@@ -1,36 +1,100 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 
 {% block content %}
 
-  <div class="container">
-      <h2>Available Hotels</h2>
-      <form class="form-inline mb-4" method="GET" action="{% url 'hotel_list' %}">
-          <label class="mr-2" for="date_from">Date From:</label>
-          <input type="date" id="date_from" name="date_from" class="form-control mr-3" required>
-          <label class="mr-2" for="date_to">Date To:</label>
-          <input type="date" id="date_to" name="date_to" class="form-control mr-3" required>
-          <label class="mr-2" for="guest_count">Guests:</label>
-          <input type="number" id="guest_count" name="guest_count" class="form-control mr-3" required>
-          <button type="submit" class="btn btn-primary">Search</button>
-      </form>
-      <div class="row">
-      {% if hotels %}
-          {% for hotel in hotels %}
-              <div class="col-md-6 mb-4">
-                  <div class="card">
-                      <img src="{{ hotel.picture1.url }}" class="card-img-top" alt="Hotel Picture">
-                      <div class="card-body">
-                          <h5 class="card-title">{{ hotel.name }}</h5>
-                          <p class="card-text">{{ hotel.address }}</p>
-                          <!-- Add more hotel details as needed -->
-                          <a href="{% url 'hotel_details' hotel.id %}" class="btn btn-primary">View Details</a>
-                      </div>
-                  </div>
-              </div>
-          {% endfor %}
-      {% else %}
-          <p>No hotels available for the selected criteria.</p>
-      {% endif %}
-  </div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <form method="GET" action="{% url 'hotel_list' %}">
+                <div class="filter-group">
+                    <h5>Country:</h5>
+                    <input type="text" id="country" name="country" class="form-control" list="country-list" {% if field_values.country %}value="{{ field_values.country }}"{% endif %}>
+                    <datalist id="country-list">
+                        {% for hotel in hotels %}
+                            <option value="{{ hotel.country }}">{{ hotel.country }}</option>
+                        {% endfor %}
+                    </datalist>
+                </div>
+                <div class="filter-group">
+                    <h5>Availability:</h5>
+                    <input type="date" id="date_from" name="date_from" class="form-control mr-3" {% if field_values.date_from %}value="{{ field_values.date_from }}"{% endif %}>
+                    <input type="date" id="date_to" name="date_to" class="form-control mr-3" {% if field_values.date_to %}value="{{ field_values.date_to }}"{% endif %}>
+                </div>
+                <div class="filter-group">
+                    <h5>Guests:</h5>
+                    <input type="number" id="guest_count" name="guest_count" class="form-control mr-3" {% if field_values.guest_count %}value="{{ field_values.guest_count }}"{% endif %}>
+                </div>
+                <div class="filter-group">
+                    <h5>Price:</h5>
+                    <input type="range" class="form-control-range" id="price" name="price"
+                        min="{{ price_range.0 }}" max="{{ price_range.1 }}" value="{{ price_filter }}">
+                    {% if price_filter %}
+                        <p>Selected Price: {{ price_filter }}</p>
+                    {% endif %}
+                </div>
+                <div class="filter-group">
+                    <h5>Rate:</h5>
+                    {% for rate in rates %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="rate" id="rate{{ rate.0 }}"
+                                value="{{ rate.0 }}" {% if rate_filter == rate.0 %}checked{% endif %}>
+                            <label class="form-check-label" for="rate{{ rate.0 }}">
+                                {% for _ in rate.1 %}
+                                    <i class="fas fa-star"></i>
+                                {% endfor %}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="filter-group">
+                    <h5>Amenities:</h5>
+                    {% for field in boolean_fields %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="{{ field }}" id="{{ field }}"
+                                {% if field in field_values %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ field }}">{{ field|title }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                <hr>
+                <div class="filter-group">
+                    <h5>Additional Filters:</h5>
+                    <!-- Add additional filters here -->
+                </div>
+                <button type="submit" class="btn btn-primary">Apply Filters</button>
+            </form>
+        </div>
+
+        <div class="col-md-9">
+            <hr>
+            {% if hotels %}
+                {% with price_range.0|floatformat:2 as min_price %}
+                    {% with price_range.1|floatformat:2 as max_price %}
+                        <h4>Price Range: ${{ min_price }} - ${{ max_price }}</h4>
+                    {% endwith %}
+                {% endwith %}
+                {% for hotel in hotels %}
+                    <div class="card mb-4">
+                        <img src="{{ hotel.cover_picture.url }}" class="card-img-top" alt="Hotel Picture">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ hotel.name }}</h5>
+                            <p class="card-text">{{ hotel.address }}</p>
+                            <a href="{% url 'hotel_details' hotel.id %}" class="btn btn-primary">View Details</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No hotels available for the selected criteria.</p>
+            {% endif %}
+        </div>
+    </div>
 </div>
+
+<style>
+    .filter-group {
+        margin-bottom: 20px;
+    }
+</style>
+
 {% endblock %}

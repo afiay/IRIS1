@@ -49,7 +49,14 @@ class Hotel(models.Model):
     has_car_rental = models.BooleanField(default=False)
     has_currency_exchange = models.BooleanField(default=False)
     # Other hotel-related fields
-
+    def calculate_average_rating(self):
+        ratings = self.ratings.all()
+        if ratings:
+            total_ratings = sum([rating.rating for rating in ratings])
+            average_rating = total_ratings / len(ratings)
+            return round(average_rating, 1)
+        else:
+            return 0
     def __str__(self):
         return self.name
 
