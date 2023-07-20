@@ -25,6 +25,7 @@ def room_list(request, hotel_id=None):
 
 import folium
 from folium.plugins import MarkerCluster
+from django.db.models import Q
 
 @login_required
 def hotel_list(request):
@@ -62,7 +63,7 @@ def hotel_list(request):
         'has_currency_exchange',
     ]
 
-    hotels = Hotel.objects.all()
+    hotels = Hotel.objects.all().distinct()
 
     if date_from and date_to and guest_count:
         guest_count = int(guest_count)
@@ -116,6 +117,7 @@ def hotel_list(request):
     paginator = Paginator(hotels, 5)  # Set the desired number of hotels per page
     page_number = request.GET.get('page')
     hotels = paginator.get_page(page_number)
+
     # Create a hotel map and add markers for hotel locations
     hotel_map = folium.Map(location=[0, 0], zoom_start=2)
     marker_cluster = MarkerCluster().add_to(hotel_map)
@@ -141,10 +143,11 @@ def hotel_list(request):
         'price_range': price_range,
         'boolean_fields': boolean_fields,
         'field_values': request.GET,
-        'hotel_map': hotel_map_html, # Add the hotel map to the template context
+        'hotel_map': hotel_map_html,  # Add the hotel map to the template context
     }
 
     return render(request, 'hotel/hotel_list.html', context)
+
 
 
 @login_required
