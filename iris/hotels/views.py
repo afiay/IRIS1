@@ -1,31 +1,34 @@
-from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Hotel, HotelRating, Room, Booking, RoomAvailability
-from .forms import BookingForm, RatingForm, RoomForm, HotelForm, RoomAvailabilityForm
-from django.db.models import Avg
-from django.contrib.auth.decorators import login_required
 from datetime import datetime, timedelta, date
 import calendar
-from django.utils.timezone import now
+from decimal import Decimal
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.db.models import Avg, Q, Min, Max
+from django.core.paginator import Paginator
+
+from .models import Hotel, HotelRating, Room, Booking, RoomAvailability
+from .forms import BookingForm, RatingForm, RoomForm, HotelForm, RoomAvailabilityForm
+
 
 @login_required
 def room_list(request, hotel_id=None):
+    """
+    View for listing rooms in a hotel or all rooms if no hotel ID is provided.
+    """
     if hotel_id:
         hotel = get_object_or_404(Hotel, pk=hotel_id)
         rooms = hotel.rooms.all()
     else:
         rooms = Room.objects.all()
     return render(request, 'room/room_list.html', {'rooms': rooms})
-from django.db import models
-from django.db.models import Q
-from decimal import Decimal
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.db.models import DecimalField
-from django.core.paginator import Paginator
+
 
 @login_required
 def hotel_list(request):
+    """
+    View for listing hotels based on various filters.
+    """
     date_from = request.GET.get('date_from')
     date_to = request.GET.get('date_to')
     guest_count = request.GET.get('guest_count')
@@ -70,7 +73,8 @@ def hotel_list(request):
         ).distinct()
 
     if rate_filter:
-        hotels = hotels.filter(ratings__isnull=False)
+        rate_filter = int(rate_filter)
+        hotels = hotels.filter(ratings__rating=rate_filter)
 
     if price_filter:
         hotels = hotels.filter(rooms__price_per_night__gt=Decimal('0.00'))
@@ -102,10 +106,10 @@ def hotel_list(request):
     ]
 
     price_range = (
-        hotels.aggregate(min_price=models.Min('rooms__price_per_night'))['min_price'] or 0,
-        hotels.aggregate(max_price=models.Max('rooms__price_per_night'))['max_price'] or 0
+        hotels.aggregate(min_price=Min('rooms__price_per_night'))['min_price'] or 0,
+        hotels.aggregate(max_price=Max('rooms__price_per_night'))['max_price'] or 0
     )
-    
+
     # Paginate the hotels queryset
     paginator = Paginator(hotels, 5)  # Set the desired number of hotels per page
     page_number = request.GET.get('page')
@@ -129,9 +133,11 @@ def hotel_list(request):
     return render(request, 'hotel/hotel_list.html', context)
 
 
-
 @login_required
 def add_hotel(request):
+    """
+    View for adding a new hotel.
+    """
     if request.method == 'POST':
         form = HotelForm(request.POST)
         if form.is_valid():
@@ -140,8 +146,13 @@ def add_hotel(request):
     else:
         form = HotelForm()
     return render(request, 'hotel/add_hotel.html', {'form': form})
+
+
 @login_required
 def edit_hotel(request, hotel_id):
+    """
+    View for editing an existing hotel.
+    """
     hotel = get_object_or_404(Hotel, pk=hotel_id)
     if request.method == 'POST':
         form = HotelForm(request.POST, instance=hotel)
@@ -151,15 +162,25 @@ def edit_hotel(request, hotel_id):
     else:
         form = HotelForm(instance=hotel)
     return render(request, 'hotel/edit_hotel.html', {'form': form, 'hotel': hotel})
+
+
 @login_required
 def delete_hotel(request, hotel_id):
+    """
+    View for deleting a hotel.
+    """
     hotel = get_object_or_404(Hotel, pk=hotel_id)
     if request.method == 'POST':
         hotel.delete()
         return redirect('hotel_list')
     return render(request, 'hotel/delete_hotel.html', {'hotel': hotel})
+
+
 @login_required
 def add_rating_hotel(request, hotel_id):
+    """
+    View for adding a rating to a hotel.
+    """
     hotel = get_object_or_404(Hotel, pk=hotel_id)
     user = request.user
     # Check if the user has already rated the hotel
@@ -175,12 +196,17 @@ def add_rating_hotel(request, hotel_id):
             return redirect('hotel_details', hotel_id=hotel_id)
 
     return redirect('hotel_details', hotel_id=hotel_id)
+
+
 @login_required
 def room_details(request, room_id):
+    """
+    View for displaying room details and availability.
+    """
     room = get_object_or_404(Room, id=room_id)
     availabilities = room.availabilities.all()
     # Get the current month and year
-    current_date = now()
+    current_date = datetime.now()
     year = current_date.year
     month = current_date.month
     # Check if there are request parameters for month and year
@@ -194,14 +220,13 @@ def room_details(request, room_id):
     start_date = datetime(year, month, 1)
     end_date = start_date.replace(day=calendar.monthrange(year, month)[1])
     # Generate the availability calendar for the selected month
- # Generate the availability calendar for the selected month
     availability_dates = []
     availability_calendar = []
     for week in calendar.monthcalendar(year, month):
         week_data = []
         for day in week:
             if day != 0:
-                date_obj = datetime(year, month, day).date()
+                date_obj = date(year, month, day)
                 availability = availabilities.filter(start_date__lte=date_obj, end_date__gte=date_obj).first()
                 if availability and availability.is_available:
                     availability_dates.append(date_obj)
@@ -215,34 +240,14 @@ def room_details(request, room_id):
     # Check if a booking was made for the room
     if request.method == 'POST':
         booking_form = BookingForm(request.POST)
-        if booking_form.is_valid():
-            check_in_date = booking_form.cleaned_data['check_in_date']
-            check_out_date = booking_form.cleaned_data['check_out_date']
-            guests = booking_form.cleaned_data['guests']
-            if availability and availability.is_available:
-                if check_in_date >= availability.start_date and check_out_date <= availability.end_date:
-                    if guests <= room.capacity:
-                        booking = booking_form.save(commit=False)
-                        booking.room = room
-                        booking.user = request.user
-                        booking.save()
-
-                        # Update availability dates after booking
-                        num_nights = (check_out_date - check_in_date).days
-                        booked_dates = [check_in_date + timedelta(days=i) for i in range(num_nights)]
-                        availability_dates = availability.get_available_dates()
-                        availability_dates = list(set(availability_dates) - set(booked_dates))
-                        availability.start_date = check_in_date
-                        availability.end_date = check_out_date
-                        availability.save()
-
-                        return redirect('booking_success', booking_id=booking.id)
-                    else:
-                        booking_form.add_error('guests', 'The room capacity is exceeded.')
-                else:
-                    booking_form.add_error(None, 'Selected dates are not available.')
-            else:
-                booking_form.add_error(None, 'No availability for the selected room.')
+        if check_booking_availability(room.hotel, booking_form):
+            booking = booking_form.save(commit=False)
+            booking.room = room
+            booking.user = request.user
+            booking.save()
+            room.hotel.availability = False
+            room.hotel.save()
+            return redirect('hotel_details', hotel_id=room.hotel.id)
     else:
         booking_form = BookingForm()
 
@@ -260,17 +265,22 @@ def room_details(request, room_id):
 
     return render(request, 'room/room_details.html', context)
 
+
 @login_required
 def room_availability(request, room_id):
-    room = Room.objects.get(pk=room_id)
-    # Get today's date
-    today = date.today()
-    # Get the availability objects for the given room that have a start_date on or after today
-    availability_dates = room.availabilities.filter(start_date__gte=today).values_list('start_date', flat=True)
+    """
+    View for displaying room availability.
+    """
+    room = get_object_or_404(Room, pk=room_id)
+    availability_dates = room.availabilities.filter(start_date__gte=date.today()).values_list('start_date', flat=True)
     return render(request, 'room/room_availability.html', {'room': room, 'availability_dates': availability_dates})
+
 
 @login_required
 def room_add_availability(request, room_id):
+    """
+    View for adding room availability.
+    """
     room = get_object_or_404(Room, pk=room_id)
     if request.method == 'POST':
         availability_form = RoomAvailabilityForm(request.POST)
@@ -283,8 +293,12 @@ def room_add_availability(request, room_id):
         availability_form = RoomAvailabilityForm()
     return render(request, 'room/room_add_availability.html', {'availability_form': availability_form, 'room': room})
 
+
 @login_required
 def room_add(request, hotel_id):
+    """
+    View for adding a new room to a hotel.
+    """
     hotel = get_object_or_404(Hotel, pk=hotel_id)
     if request.method == 'POST':
         room_form = RoomForm(request.POST, prefix='room')
@@ -303,8 +317,12 @@ def room_add(request, hotel_id):
         availability_form = RoomAvailabilityForm(prefix='availability')
     return render(request, 'room/room_add.html', {'room_form': room_form, 'availability_form': availability_form, 'hotel': hotel})
 
+
 @login_required
 def room_edit(request, room_id):
+    """
+    View for editing an existing room.
+    """
     room = get_object_or_404(Room, pk=room_id)
     hotel = room.hotel
     if request.method == 'POST':
@@ -316,8 +334,12 @@ def room_edit(request, room_id):
         form = RoomForm(instance=room)
     return render(request, 'room/room_edit.html', {'form': form, 'room': room, 'hotel': hotel})
 
+
 @login_required
 def delete_availability(request, room_id, availability_id):
+    """
+    View for deleting room availability.
+    """
     room = get_object_or_404(Room, id=room_id)
     availability = get_object_or_404(RoomAvailability, id=availability_id, room=room)
     if request.method == 'POST':
@@ -325,8 +347,12 @@ def delete_availability(request, room_id, availability_id):
         return redirect('room_details', room_id=room_id)
     return render(request, 'room/delete_availability.html', {'room': room, 'availability': availability})
 
+
 @login_required
 def edit_availability(request, room_id, availability_id):
+    """
+    View for editing room availability.
+    """
     room = get_object_or_404(Room, id=room_id)
     availability = get_object_or_404(RoomAvailability, id=availability_id)
     if request.method == 'POST':
@@ -346,8 +372,12 @@ def edit_availability(request, room_id, availability_id):
     }
     return render(request, 'room/edit_availability.html', context)
 
+
 @login_required
 def availability_delete(request, room_id, availability_id):
+    """
+    View for deleting room availability.
+    """
     room = get_object_or_404(Room, id=room_id)
     availability = get_object_or_404(RoomAvailability, id=availability_id, room=room)
     if request.method == 'POST':
@@ -355,8 +385,12 @@ def availability_delete(request, room_id, availability_id):
         return redirect('room_details', room_id=room_id)
     return render(request, 'room/availability_delete.html', {'room': room, 'availability': availability})
 
+
 @login_required
 def edit_room(request, room_id):
+    """
+    View for editing an existing room.
+    """
     room = get_object_or_404(Room, id=room_id)
     if request.method == 'POST':
         form = RoomForm(request.POST, instance=room)
@@ -371,6 +405,9 @@ def edit_room(request, room_id):
 
 @login_required
 def hotel_details(request, hotel_id):
+    """
+    View for displaying hotel details and ratings.
+    """
     hotel = get_object_or_404(Hotel, pk=hotel_id)
     ratings = hotel.ratings.all()
     booking_form = BookingForm()
@@ -401,57 +438,68 @@ def hotel_details(request, hotel_id):
         'average_rating': average_rating,
     })
 
-def get_rating_form(hotel, user):
-    if not HotelRating.objects.filter(hotel=hotel, user=user).exists():
-        return RatingForm()
-    return None
-
-from django.forms.utils import ErrorList
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.forms.utils import ErrorList
-from datetime import timedelta
-from django.shortcuts import get_object_or_404
 
 @login_required
 def booking(request, room_id):
+    """
+    View for making a booking for a room.
+    """
     room = get_object_or_404(Room, pk=room_id)
-    availability = room.availabilities.first()  # Get the first availability associated with the room, adjust the logic as needed
+    availability = room.availabilities.first()
     if request.method == 'POST':
         booking_form = BookingForm(request.POST)
-        if booking_form.is_valid():
-            check_in_date = booking_form.cleaned_data['check_in_date']
-            check_out_date = booking_form.cleaned_data['check_out_date']
-            guests = booking_form.cleaned_data['guests']
-
-            if availability and availability.is_available:
-                if check_in_date >= availability.start_date and check_out_date <= availability.end_date:
-                    if guests <= room.capacity:
-                        booking = booking_form.save(commit=False)
-                        booking.room = room
-                        booking.user = request.user
-                        booking.save()
-
-                        # Update availability dates after booking
-                        num_nights = (check_out_date - check_in_date).days
-                        booked_dates = [check_in_date + timedelta(days=i) for i in range(num_nights)]
-                        availability_dates = availability.get_available_dates()
-                        availability_dates = list(set(availability_dates) - set(booked_dates))
-                        availability.start_date = check_in_date
-                        availability.end_date = check_out_date
-                        availability.save()
-                        return redirect('booking_success', booking_id=booking.id)
-                    else:
-                        booking_form.add_error('guests', 'The room capacity is exceeded.')
-                else:
-                    booking_form.add_error(None, 'Selected dates are not available.')
-            else:
-                booking_form.add_error(None, 'No availability for the selected room.')
+        if check_booking_availability(room.hotel, booking_form):
+            booking = booking_form.save(commit=False)
+            booking.room = room
+            booking.user = request.user
+            booking.save()
+            room.hotel.availability = False
+            room.hotel.save()
+            return redirect('hotel_details', hotel_id=room.hotel.id)
     else:
         booking_form = BookingForm()
     return render(request, 'hotel/booking.html', {'room': room, 'booking_form': booking_form, 'availability': availability})
 
+
 @login_required
 def booking_success(request, booking_id):
+    """
+    View for displaying a booking success message.
+    """
     booking = get_object_or_404(Booking, pk=booking_id)
     return render(request, 'room/booking_success.html', {'booking': booking})
+
+
+def get_rating_form(hotel, user):
+    """
+    Helper function to get the rating form for a hotel and user.
+    """
+    if not HotelRating.objects.filter(hotel=hotel, user=user).exists():
+        return RatingForm()
+    return None
+
+
+def check_booking_availability(hotel, booking_form):
+    """
+    Helper function to check the availability for a booking form.
+    """
+    check_in_date = booking_form.cleaned_data['check_in_date']
+    check_out_date = booking_form.cleaned_data['check_out_date']
+    guests = booking_form.cleaned_data['guests']
+
+    if not hotel.availability:
+        booking_form.add_error(None, 'No availability for the selected room.')
+        return False
+
+    availability = hotel.rooms.filter(availabilities__start_date__lte=check_in_date,
+                                      availabilities__end_date__gte=check_out_date,
+                                      availabilities__is_available=True).first()
+    if not availability:
+        booking_form.add_error(None, 'Selected dates are not available.')
+        return False
+
+    if guests > availability.room.capacity:
+        booking_form.add_error('guests', 'The room capacity is exceeded.')
+        return False
+
+    return True
