@@ -31,18 +31,6 @@ IRIS Booking is a web application built with Django that allows users to find an
 - Folium (for map integration)
 - PostgreSQL (or any other database supported by Django)
 
-## Installation and Setup
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/yourusername/your-repo-name.git
-cd your-repo-name
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver
-
 Access the application at http://localhost:8000/
 ## Usage
 Start the Django development server using the runserver command.
@@ -56,3 +44,17 @@ Contributions are welcome! If you find any issues or have suggestions for improv
 
 ## License
 This project is licensed under the MIT License.
+
+## Installation and Setup
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/yourusername/your-repo-name.git
+cd your-repo-name
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+
+
