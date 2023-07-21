@@ -11,7 +11,7 @@
 
 ## Description
 
-Your Application Name is a web application built with Django that allows users to find and book hotels based on various filters, check room availability, and leave ratings and reviews for the hotels they have visited.
+IRIS Booking is a web application built with Django that allows users to find and book hotels based on various filters, check room availability, and leave ratings and reviews for the hotels they have visited.
 
 ## Features
 
