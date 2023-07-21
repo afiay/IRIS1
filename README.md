@@ -6,13 +6,11 @@
 ## Home page
 <p align="center"><img src="./readme_assets/home.jpg"></p>
 
-## Hotel View
-<p align="center"><img src="./readme_assets/hotel_view.jpg"></p>
-
 ## Description
 
 IRIS Booking is a web application built with Django that allows users to find and book hotels based on various filters, check room availability, and leave ratings and reviews for the hotels they have visited.
-
+## Hotel View
+<p align="center"><img src="./readme_assets/hotel_view.jpg"></p>
 ## Features
 
 - User Registration and Authentication: Users can sign up, log in, and log out to access the application's features.
