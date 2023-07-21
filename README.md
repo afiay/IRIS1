@@ -2,7 +2,7 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
 [![Django Version](https://img.shields.io/badge/django-3.2%2B-green)](https://www.djangoproject.com/download/)
-
+<p align="center"><img src="./readme_assets/home.jpg"></p>
 ## Description
 
 Your Application Name is a web application built with Django that allows users to find and book hotels based on various filters, check room availability, and leave ratings and reviews for the hotels they have visited.
