@@ -42,3 +42,17 @@ pip install -r requirements.txt
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
+
+Access the application at http://localhost:8000/
+## Usage
+Start the Django development server using the runserver command.
+Visit http://localhost:8000/ in your web browser to access the application.
+Use the provided filters and search functionality to find hotels based on your preferences.
+View hotel details to see more information about a specific hotel, including available rooms and ratings.
+Leave a rating and review for hotels you have visited by using the rating form.
+Log in to the admin panel at http://localhost:8000/admin/ to manage hotels, rooms, bookings, and user ratings.
+Contributing
+Contributions are welcome! If you find any issues or have suggestions for improvements, feel free to create a new issue or submit a pull request.
+
+## License
+This project is licensed under the MIT License.
