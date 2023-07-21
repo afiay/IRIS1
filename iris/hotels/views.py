@@ -118,17 +118,17 @@ def hotel_list(request):
         hotels.aggregate(max_price=Max('rooms__price_per_night'))['max_price'] or 0
     )
     # Create a list to hold hotel data for the map
+
     hotels_data = []
     for hotel in hotels:
         latitude = hotel.latitude
         longitude = hotel.longitude
-        price = hotel.rooms.aggregate(min_price=Min('price_per_night'))['min_price'] or 0
         popup_html = (
             f'<img src="{escape(hotel.cover_picture.url)}" alt="Hotel Picture" style="width: 100px; height: auto;"><br>'
             f'<strong>{escape(hotel.name)}</strong><br>'
-            f'Price: ${price}<br>'  # Show the hotel price here
             f'{escape(hotel.address)}<br>'
-            f'<a href="{escape(reverse("hotel_details", args=[hotel.id]))}" class="btn btn-primary">View Details</a>'
+            # Modified popup_html to include a link that opens the hotel details in a new tab
+            f'<a href="{escape(reverse("hotel_details", args=[hotel.id]))}" target="_blank" class="btn btn-primary">View Details</a>'
         )
         hotels_data.append({
             'latitude': latitude,
