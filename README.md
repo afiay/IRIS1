@@ -1,4 +1,4 @@
-# IRIS Booking
+# IRISTRIP
 
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
 [![Django Version](https://img.shields.io/badge/django-3.2%2B-green)](https://www.djangoproject.com/download/)
@@ -8,7 +8,7 @@
 
 ## Description
 
-IRIS Booking is a web application built with Django that allows users to find and book hotels based on various filters, check room availability, and leave ratings and reviews for the hotels they have visited.
+IRISTRIP is a web application built with Django that allows users to find and book hotels based on various filters, check room availability, and leave ratings and reviews for the hotels they have visited.
 ## Hotel View
 <p align="center"><img src="./readme_assets/hotel_view.jpg"></p>
 
