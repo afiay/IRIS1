@@ -131,21 +131,34 @@
 </style>
 
 <script>
-    mapboxgl.accessToken = 'YOUR_MAPBOX_ACCESS_TOKEN';
-    var map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v11',
-        center: [0, 0],
-        zoom: 2
-    });
+    var hotelsData = {{ hotels_data|safe }};
+    var hotelMap = L.map('map').setView([0, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '',
+        maxZoom: 19,
+    }).addTo(hotelMap);
 
-    map.addControl(new mapboxgl.NavigationControl());
+    var markerCluster = L.markerClusterGroup();
+    hotelMap.addLayer(markerCluster);
 
-    {% for hotel in hotels %}
-        var marker = new mapboxgl.Marker()
-            .setLngLat([{{ hotel.longitude }}, {{ hotel.latitude }}])
-            .addTo(map);
-    {% endfor %}
+    for (var i = 0; i < hotelsData.length; i++) {
+        var hotelData = hotelsData[i];
+        var marker = L.marker([hotelData.latitude, hotelData.longitude]);
+        marker.bindPopup(hotelData.popup_html).openPopup();
+        markerCluster.addLayer(marker);
+
+        // Add click event to the marker
+        marker.on('click', function (e) {
+            var hotelName = e.target.options.title;
+            openHotelDetails(hotelName);
+        });
+    }
+
+    function openHotelDetails(hotelName) {
+        // You can use the hotelName to fetch additional hotel details and display them
+        // on the map or redirect to a separate page with more details.
+        // For simplicity, I'm just displaying an alert with the hotel name.
+        alert('Viewing details for hotel: ' + hotelName);
+    }
 </script>
-
 {% endblock %}

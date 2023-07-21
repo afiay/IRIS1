@@ -6,6 +6,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Q, Min, Max
 from django.core.paginator import Paginator
+from django.urls import reverse
 
 from .models import Hotel, HotelRating, Room, Booking, RoomAvailability
 from .forms import BookingForm, RatingForm, RoomForm, HotelForm, RoomAvailabilityForm
@@ -26,6 +27,8 @@ def room_list(request, hotel_id=None):
 import folium
 from folium.plugins import MarkerCluster
 from django.db.models import Q
+from django.utils.html import escape
+import json
 
 @login_required
 def hotel_list(request):
@@ -39,6 +42,8 @@ def hotel_list(request):
     price_filter = request.GET.get('price')
     country_filter = request.GET.get('country')
     availability_filter = request.GET.get('availability')
+
+    hotels = Hotel.objects.all().distinct()
 
     boolean_fields = [
         'has_pool',
@@ -112,20 +117,41 @@ def hotel_list(request):
         hotels.aggregate(min_price=Min('rooms__price_per_night'))['min_price'] or 0,
         hotels.aggregate(max_price=Max('rooms__price_per_night'))['max_price'] or 0
     )
-
+    # Create a list to hold hotel data for the map
+    hotels_data = []
+    for hotel in hotels:
+        latitude = hotel.latitude
+        longitude = hotel.longitude
+        price = hotel.rooms.aggregate(min_price=Min('price_per_night'))['min_price'] or 0
+        popup_html = (
+            f'<img src="{escape(hotel.cover_picture.url)}" alt="Hotel Picture" style="width: 100px; height: auto;"><br>'
+            f'<strong>{escape(hotel.name)}</strong><br>'
+            f'Price: ${price}<br>'  # Show the hotel price here
+            f'{escape(hotel.address)}<br>'
+            f'<a href="{escape(reverse("hotel_details", args=[hotel.id]))}" class="btn btn-primary">View Details</a>'
+        )
+        hotels_data.append({
+            'latitude': latitude,
+            'longitude': longitude,
+            'popup_html': popup_html,
+            'name': hotel.name,
+        })
     # Paginate the hotels queryset
     paginator = Paginator(hotels, 5)  # Set the desired number of hotels per page
     page_number = request.GET.get('page')
     hotels = paginator.get_page(page_number)
-
-    # Create a hotel map and add markers for hotel locations
-    hotel_map = folium.Map(location=[0, 0], zoom_start=2)
+    # Generate the HTML representation of the hotel map
+    hotel_map = folium.Map(location=[0, 0], zoom_start=2, attribution=None)
+    # Remove the attribution (credit) from the map
+    folium.TileLayer('openstreetmap', attr='').add_to(hotel_map)
     marker_cluster = MarkerCluster().add_to(hotel_map)
 
-    for hotel in hotels:
-        latitude = hotel.latitude
-        longitude = hotel.longitude
-        folium.Marker([latitude, longitude]).add_to(marker_cluster)
+    for hotel_data in hotels_data:
+        latitude = hotel_data['latitude']
+        longitude = hotel_data['longitude']
+        popup_html = hotel_data['popup_html']
+        hotel_name = hotel_data['name']
+        folium.Marker([latitude, longitude], popup=popup_html, tooltip=hotel_name).add_to(marker_cluster)
 
     # Generate the HTML representation of the hotel map
     hotel_map_html = hotel_map._repr_html_()
@@ -144,6 +170,7 @@ def hotel_list(request):
         'boolean_fields': boolean_fields,
         'field_values': request.GET,
         'hotel_map': hotel_map_html,  # Add the hotel map to the template context
+        'hotels_data': json.dumps(hotels_data),  # Add the hotels_data to the template context
     }
 
     return render(request, 'hotel/hotel_list.html', context)

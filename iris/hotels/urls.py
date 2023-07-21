@@ -22,5 +22,6 @@ urlpatterns = [
     path('room/availability/edit/<int:room_id>/<int:availability_id>/', views.edit_availability, name='edit_availability'),
     path('room/availability/delete/<int:room_id>/<int:availability_id>/', views.availability_delete, name='availability_delete'),
     path('room/edit/<int:room_id>/', views.edit_room, name='edit_room'),
-    path('hotel/details/<int:hotel_id>/', views.hotel_details, name='hotel_details'),
+    path('hotels/<int:hotel_id>/', views.hotel_details, name='hotel_details'),
+
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
