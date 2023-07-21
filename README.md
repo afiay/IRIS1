@@ -1,4 +1,4 @@
-# Your Application Name
+# IRIS Booking
 
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
 [![Django Version](https://img.shields.io/badge/django-3.2%2B-green)](https://www.djangoproject.com/download/)
